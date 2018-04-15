@@ -1,14 +1,51 @@
-/*
 
-  cross-env NODE_ENV=production webpack --config ./webserv/webpack.config.webserv
+'use strict'
 
-  electron-json-storage .get .set
-  fs .writeFile .readFile
-  electron.clipboard .writeText
-  electron.remote.dialog .showSaveDialog .showOpenDialog
-  electron.shell .openExternal
+const path = require('path')
+const webpack = require('webpack')
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const _ = require('lodash')
 
-  @ledgerhq/hw-transport-node-hid -> @ledgerhq/hw-transport-u2f
-        app/ledger/neonLedger.js
+module.exports = require('../config/webpack.config.prod')
 
-*/
+module.exports.output.path =
+  path.join(__dirname, 'deploy', 'www')
+
+// remove node-hid dependency; we use WebUSB
+module.exports.externals = undefined
+
+module.exports.target = 'web'
+
+module.exports.plugins.unshift(
+  new webpack.NormalModuleReplacementPlugin(
+    /^electron-json-storage$/,
+    path.join(__dirname, 'src', 'electron-json-storage.js')
+    // res => {
+    //   console.log(res)
+    //   res.request = '../../webserv/src/electron-json-storage'
+    // }
+  ),
+  new webpack.NormalModuleReplacementPlugin(
+    /^fs$/,
+    path.join(__dirname, 'src', 'fs.js')
+    // .writeFile .readFile
+  ),
+  new webpack.NormalModuleReplacementPlugin(
+    /^\.\/electron$/,
+    path.join(__dirname, 'src', 'dot-electron.js')
+    // export const openExternal = (srcLink: string)
+  ),
+  new webpack.NormalModuleReplacementPlugin(
+    /^electron$/,
+    path.join(__dirname, 'src', 'electron.js')
+    // clipboard.writeText(text)
+    // remote.dialog .showSaveDialog .showOpenDialog
+  ),
+  new webpack.NormalModuleReplacementPlugin(
+    /^@ledgerhq\/hw-transport-node-hid$/,
+    path.join(__dirname, 'lib', 'node_modules', '@ledgerhq/hw-transport-u2f')
+  )
+)
+
+// dev
+_.remove(module.exports.plugins, v => v instanceof UglifyJSPlugin)
