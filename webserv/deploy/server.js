@@ -1,73 +1,28 @@
-/*
+
+const args = require('minimist')(process.argv.slice(2))
+const fse = require('fs-extra')
 const http = require('http')
-const port = 3000
-
-const requestHandler = (request, response) => {
-  console.log(request.url)
-  response.end('Hello from Neo Wallet Server!')
-}
-
-const server = http.createServer(requestHandler)
-
-server.listen(port, (err) => {
-  if (err) {
-    return console.log('something bad happened', err)
-  }
-
-  console.log(`server is listening on ${port}`)
+const express = require('express')
+const app = express()
+const WebSocket = require('ws')
+const server = http.createServer(app, {
+  cert: args.cert ? fs.readFileSync(args.cert) : undefined,
+  key: args.key ? fs.readFileSync(args.key) : undefined
 })
-*/
+const wss = new WebSocket.Server({ server: server, path: '/ws' })
 
-var http = require('http');
-var fs = require('fs');
-var path = require('path');
-var prefix = './www';
+console.log('using wallet dir: ' + args.walletdir)
+fse.ensureDirSync(args.walletdir)
 
-http.createServer(function (request, response) {
-    console.log('request starting...');
+wss.on('connection', (ws) => {
+  ws.on('message', (message) => {
+    console.log('ws received: %s', message)
+  })
+  ws.send('wallet dir: ' + args.walletdir)
+})
 
-    var filePath = request.url;
-    if (filePath == '/')
-        filePath = '/index.html';
+app.use(express.static('www'))
 
-    var extname = path.extname(filePath);
-    var contentType = 'text/html';
-    switch (extname) {
-        case '.js':
-            contentType = 'text/javascript';
-            break;
-        case '.css':
-            contentType = 'text/css';
-            break;
-        case '.json':
-            contentType = 'application/json';
-            break;
-        case '.png':
-            contentType = 'image/png';
-            break;
-        case '.jpg':
-            contentType = 'image/jpg';
-            break;
-    }
-
-    fs.readFile(prefix + filePath, function(error, content) {
-        if (error) {
-            if(error.code == 'ENOENT'){
-                fs.readFile(prefix + '/404.html', function(error, content) {
-                    response.writeHead(200, { 'Content-Type': contentType });
-                    response.end(content, 'utf-8');
-                });
-            }
-            else {
-                response.writeHead(500);
-                response.end('Sorry, check with the site admin for error: '+error.code+' ..\n');
-                response.end();
-            }
-        }
-        else {
-            response.writeHead(200, { 'Content-Type': contentType });
-            response.end(content, 'utf-8');
-        }
-    });
-
-}).listen(3000);
+server.listen(3000, () => {
+  console.log('Neon Wallet Server listening on port 3000')
+})

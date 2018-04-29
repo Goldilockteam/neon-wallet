@@ -1,0 +1,14 @@
+{
+  "name": "neon-web-server",
+  "version": "0.0.1",
+  "description": "Server side support for Goldilock NEO Wallet",
+  "homepage": "https://github.com/Goldilockteam/neon-wallet",
+  "author": "Goldilock <info@goldilock.com> (https://github.com/Goldilockteam)",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.3",
+    "fs-extra": "^5.0.0",
+    "minimist": "^1.2.0",
+    "ws": "^5.1.1"
+  }
+}

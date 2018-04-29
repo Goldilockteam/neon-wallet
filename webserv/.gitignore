@@ -1,1 +1,3 @@
 /lib/node_modules
+/deploy/node_modules
+/tmp

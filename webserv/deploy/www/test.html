@@ -1,0 +1,36 @@
+<html>
+  <script>
+
+  var connect = function() {
+    var socket = new WebSocket('ws://' + location.host + '/ws');
+
+    var send = function(obj) {
+      socket.send(JSON.stringify(obj))
+    };
+
+    socket.onopen = function() {
+      // send({ cmd: 'test' });
+    };
+
+    socket.onerror = function(err) {
+      console.error(err);
+    };
+
+    socket.onclose = function(err) {
+      setTimeout(function() { connect(); }, 1000);
+    };
+
+    var info = {}
+
+    socket.onmessage = function(packet) {
+      // var msg = JSON.parse(packet.data);
+      console.log(packet.data);
+    }
+  };
+
+  connect();
+
+  </script>
+  <body>
+  </body>
+</html>
