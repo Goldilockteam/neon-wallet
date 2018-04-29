@@ -7,7 +7,8 @@ const app = express()
 const WebSocket = require('ws')
 const server = http.createServer(app, {
   cert: args.cert ? fs.readFileSync(args.cert) : undefined,
-  key: args.key ? fs.readFileSync(args.key) : undefined
+  key: args.key ? fs.readFileSync(args.key) : undefined,
+  passphrase: args.pass || undefined
 })
 const wss = new WebSocket.Server({ server: server, path: '/ws' })
 
