@@ -1,0 +1,11 @@
+{
+  "name": "neon-wallet-goldilock",
+  "version": "0.0.1",
+  "description": "NEON Wallet modification for Goldilock",
+  "homepage": "https://github.com/Goldilockteam/neon-wallet",
+  "author": "Goldilock <info@goldilock.com> (https://github.com/Goldilockteam)",
+  "license": "ISC",
+  "dependencies": {
+    "select": "^1.1.2"
+  }
+}

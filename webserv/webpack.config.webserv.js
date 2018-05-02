@@ -1,4 +1,6 @@
 
+// !node_modules,!__e2e__,!__mocks__,!__tests__,!coverage,!flow-typed,!bundle.js
+
 'use strict'
 
 const path = require('path')
@@ -20,10 +22,9 @@ module.exports.plugins.unshift(
   new webpack.NormalModuleReplacementPlugin(
     /^electron-json-storage$/,
     path.join(__dirname, 'src', 'electron-json-storage.js')
-    // res => {
-    //   console.log(res)
-    //   res.request = '../../webserv/src/electron-json-storage'
-    // }
+    // .get .set
+    // +getStorage, +setStorage
+    // 'userWallet', 'addressBook', 'settings'
   ),
   new webpack.NormalModuleReplacementPlugin(
     /^fs$/,

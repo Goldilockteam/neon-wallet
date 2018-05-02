@@ -15,7 +15,7 @@ export const get = (key, options, callback) => {
   options = options || {}
   callback = callback || _.noop
 
-  // dogz
+  // ws.req(...).then(...callback...)
 
   return callback(null, {})
 }
@@ -27,6 +27,11 @@ export const set = (key, json, options, callback) => {
 
   options = options || {}
   callback = callback || _.noop
+
+  // ws.req(...).then(...callback...)
+
+  // TODO need to also remove pkeys from the 'json'
+  // if the key is 'userWallet'
 
   return callback()
 }
