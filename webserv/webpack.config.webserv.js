@@ -20,36 +20,37 @@ module.exports.target = 'web'
 
 module.exports.plugins.unshift(
   new webpack.NormalModuleReplacementPlugin(
-    /^electron-json-storage$/,
-    path.join(__dirname, 'src', 'electron-json-storage.js')
     // .get .set
     // +getStorage, +setStorage
     // 'userWallet', 'addressBook', 'settings'
+    /^electron-json-storage$/,
+    path.join(__dirname, 'src', 'electron-json-storage.js')
   ),
   new webpack.NormalModuleReplacementPlugin(
+    // .writeFile .readFile
     /^fs$/,
     path.join(__dirname, 'src', 'fs.js')
-    // .writeFile .readFile
   ),
   new webpack.NormalModuleReplacementPlugin(
+    // export const openExternal = (srcLink: string)
     /^\.\/electron$/,
     path.join(__dirname, 'src', 'dot-electron.js')
-    // export const openExternal = (srcLink: string)
   ),
   new webpack.NormalModuleReplacementPlugin(
-    /^electron$/,
-    path.join(__dirname, 'src', 'electron.js')
     // clipboard.writeText(text)
     // remote.dialog .showSaveDialog .showOpenDialog
-
-    // function(resource) {
-    //   console.dir(resource);
-    //   resource.request = path.join(__dirname, 'src', 'electron.js');
-    // }
+    /^electron$/,
+    path.join(__dirname, 'src', 'electron.js')
   ),
   new webpack.NormalModuleReplacementPlugin(
+    // ledger
     /^@ledgerhq\/hw-transport-node-hid$/,
-    path.join(__dirname, 'lib', 'node_modules', '@ledgerhq/hw-transport-u2f')
+    path.join(__dirname, 'node_modules', '@ledgerhq/hw-transport-u2f')
+  ),
+  new webpack.NormalModuleReplacementPlugin(
+    // httpsOnly, signTx
+    /^neon-js$/,
+    path.join(__dirname, 'node_modules', '@cityofzion/neon-js')
   )
 )
 

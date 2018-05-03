@@ -6,6 +6,8 @@
   "author": "Goldilock <info@goldilock.com> (https://github.com/Goldilockteam)",
   "license": "ISC",
   "dependencies": {
+    "@cityofzion/neon-js": "git://github.com/goldilockteam/neon-js.git#goldilock",
+    "@ledgerhq/hw-transport-u2f": "^4.7.3",
     "select": "^1.1.2"
   }
 }

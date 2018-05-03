@@ -5,7 +5,7 @@ Neon Wallet served over HTTPS from an user-private, air-gap connected device.
 - clone the repo
 - make sure you are on branch `goldilock`
 - `npm install` in the root directory
-- `npm install` in the `./webserv/lib` directory
+- `npm install` in the `./webserv` directory
 - `. webserv/pack.sh` in the root directory
 
 # How to run
