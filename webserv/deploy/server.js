@@ -5,22 +5,24 @@ const http = require('http')
 const https = require('https')
 const express = require('express')
 const app = express()
-const WebSocket = require('ws')
-// https.globalAgent.options.ca = [ fse.readFileSync(args.ca) ]
-const server = (args.cert ? https : http).createServer({
-  key: args.key ? fse.readFileSync(args.key) : undefined,
-  cert: args.cert ? fse.readFileSync(args.cert) : undefined,
-  ca: args.ca ? fse.readFileSync(args.ca) : undefined,
-  passphrase: args.pass || undefined
-}, app)
-const wss = new WebSocket.Server({ server: server, path: '/ws' })
 const moment = require('moment')
+const WebSocket = require('ws')
 const electronJsonStorage = require('./electron-json-storage')
+
+const server = args.cert ?
+  https.createServer({
+    key: args.key ? fse.readFileSync(args.key) : undefined,
+    cert: args.cert ? fse.readFileSync(args.cert) : undefined,
+    ca: args.ca ? fse.readFileSync(args.ca) : undefined,
+    passphrase: args.pass || undefined
+  }, app) :
+  http.createServer(app)
+
+const wss = new WebSocket.Server({ server: server, path: '/ws' })
 
 fse.ensureDirSync(args.walletdir)
 const ejsOpts = { dataPath: args.walletdir }
 
-// WS API
 wss.on('connection', (ws) => {
   const wsSend = (obj) => ws.send(JSON.stringify(obj))
 
