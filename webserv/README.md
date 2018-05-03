@@ -12,5 +12,6 @@ Neon Wallet served over HTTPS from an user-private, air-gap connected device.
 - `npm install` in the `./webserv/deploy` directory
 - `node server.js --walletdir tmp` in the `./webserv/deploy` directory
   - add `--cert ssl/cert.pem --key ssl/key.pem` for SSL
-  - use `--pass` if your SSL key require a passphrase
+    - use `--ca` for certificate authority certificate
+    - use `--pass` if your SSL key require a passphrase
 - point your Chrome browser to `http://localhost:3000`

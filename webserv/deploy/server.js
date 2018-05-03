@@ -2,19 +2,21 @@
 const args = require('minimist')(process.argv.slice(2))
 const fse = require('fs-extra')
 const http = require('http')
+const https = require('https')
 const express = require('express')
 const app = express()
 const WebSocket = require('ws')
-const server = http.createServer(app, {
-  cert: args.cert ? fse.readFileSync(args.cert) : undefined,
+// https.globalAgent.options.ca = [ fse.readFileSync(args.ca) ]
+const server = (args.cert ? https : http).createServer({
   key: args.key ? fse.readFileSync(args.key) : undefined,
+  cert: args.cert ? fse.readFileSync(args.cert) : undefined,
   ca: args.ca ? fse.readFileSync(args.ca) : undefined,
-  passphrase: args.pass || undefined })
+  passphrase: args.pass || undefined
+}, app)
 const wss = new WebSocket.Server({ server: server, path: '/ws' })
 const moment = require('moment')
 const electronJsonStorage = require('./electron-json-storage')
 
-console.log('using wallet dir: ' + args.walletdir)
 fse.ensureDirSync(args.walletdir)
 const ejsOpts = { dataPath: args.walletdir }
 
@@ -70,7 +72,7 @@ wss.on('connection', (ws) => {
   })
 })
 
-app.use(express.static('www'))
+app.use(express.static(args.webdir || 'www'))
 
 server.listen(3000, () => {
   console.log('listening on port 3000')
