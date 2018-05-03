@@ -1,0 +1,1 @@
+{"name":"userWallet","version":"1.0","scrypt":{"cost":16384,"blockSize":8,"parallel":8,"size":64},"accounts":[{"address":"AZn1KB5v7i8iHJUsoGqjYRFsqGrQgK46EA","label":"xxxx","isDefault":false,"lock":false,"key":"6PYRE4epgKDqmAgtUvHswopc9TvyxEaqTzisUgjZ9Wt5UbeVYpHywu2LCL","contract":{},"extra":null}],"extra":null}

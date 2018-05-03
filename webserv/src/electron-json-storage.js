@@ -15,9 +15,12 @@ export const get = (key, options, callback) => {
   options = options || {}
   callback = callback || _.noop
 
-  // ws.req(...).then(...callback...)
-
-  return callback(null, {})
+  window._comm.req({
+    fn: 'electron-json-storage.get',
+    key: key
+  })
+  .then((data) => callback(null, data))
+  .catch((err) => callback(err));
 }
 
 export const set = (key, json, options, callback) => {
@@ -28,12 +31,16 @@ export const set = (key, json, options, callback) => {
   options = options || {}
   callback = callback || _.noop
 
-  // ws.req(...).then(...callback...)
+  window._comm.req({
+    fn: 'electron-json-storage.set',
+    key: key,
+    val: json
+  })
+  .then(callback)
+  .catch((err) => callback(err));
 
   // TODO need to also remove pkeys from the 'json'
   // if the key is 'userWallet'
-
-  return callback()
 }
 
 export default {

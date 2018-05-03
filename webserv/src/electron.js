@@ -5,7 +5,7 @@ import {
   showErrorNotification,
   showSuccessNotification,
   showInfoNotification
-} from '../../modules/api/notifications'
+} from '../../app/modules/notifications'
 
 // import { clipboard } from 'electron'
   // .writeText(text)

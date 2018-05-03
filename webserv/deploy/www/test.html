@@ -1,36 +1,36 @@
 <html>
-  <script>
+  <head>
+    <script>
 
-  var connect = function() {
-    var socket = new WebSocket('ws://' + location.host + '/ws');
+    var connect = function() {
+      var socket = new WebSocket('ws://' + location.host + '/ws');
 
-    var send = function(obj) {
-      socket.send(JSON.stringify(obj))
+      var send = function(obj) {
+        socket.send(JSON.stringify(obj))
+      };
+
+      socket.onopen = function() {
+        // send({ cmd: 'test' });
+      };
+
+      socket.onerror = function(err) {
+        console.error(err);
+      };
+
+      socket.onclose = function(err) {
+        setTimeout(function() { connect(); }, 1000);
+      };
+
+      socket.onmessage = function(packet) {
+        // var msg = JSON.parse(packet.data);
+        console.log(packet.data);
+      }
     };
 
-    socket.onopen = function() {
-      // send({ cmd: 'test' });
-    };
+    connect();
 
-    socket.onerror = function(err) {
-      console.error(err);
-    };
-
-    socket.onclose = function(err) {
-      setTimeout(function() { connect(); }, 1000);
-    };
-
-    var info = {}
-
-    socket.onmessage = function(packet) {
-      // var msg = JSON.parse(packet.data);
-      console.log(packet.data);
-    }
-  };
-
-  connect();
-
-  </script>
+    </script>
+  </head>
   <body>
   </body>
 </html>

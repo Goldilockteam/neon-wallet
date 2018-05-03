@@ -41,6 +41,11 @@ module.exports.plugins.unshift(
     path.join(__dirname, 'src', 'electron.js')
     // clipboard.writeText(text)
     // remote.dialog .showSaveDialog .showOpenDialog
+
+    // function(resource) {
+    //   console.dir(resource);
+    //   resource.request = path.join(__dirname, 'src', 'electron.js');
+    // }
   ),
   new webpack.NormalModuleReplacementPlugin(
     /^@ledgerhq\/hw-transport-node-hid$/,
