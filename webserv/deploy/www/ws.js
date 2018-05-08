@@ -3,7 +3,11 @@ window._comm = {
   counter: 0,
   requests: {},
   connected: false,
-  buffer: []
+  buffer: [],
+  timer: setInterval(function() {
+    if(window._comm.heartbeat)
+      window._comm.heartbeat();
+  }, 5000)
 };
 
 var connect = function() {
@@ -22,6 +26,11 @@ var connect = function() {
         reject: reject
       }
     });
+  };
+
+  window._comm.heartbeat = function() {
+    if(window._comm.connected)
+      socket.send('true');
   };
 
   var send = function(json) {

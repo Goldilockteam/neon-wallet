@@ -30,6 +30,8 @@ wss.on('connection', (ws) => {
     let msg = null;
     try {
       msg = JSON.parse(json)
+      if(msg === true)
+        return
       // const cb = () => wsSend({ resId: msg.reqId, args: arguments })
       // msg.args.push(cb)
       console.log(`request start: ${msg.fn} ${msg.id}`)
