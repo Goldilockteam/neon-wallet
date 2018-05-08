@@ -1,6 +1,6 @@
 /node_modules
 /lib/node_modules
 /deploy/node_modules
-/tmp
+/deploy/tmp
 /deploy/www/test.js
 /ssl.sh
