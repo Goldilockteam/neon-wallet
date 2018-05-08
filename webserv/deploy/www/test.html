@@ -3,7 +3,8 @@
     <script>
 
     var connect = function() {
-      var socket = new WebSocket('ws://' + location.host + '/ws');
+      var socket = new WebSocket((location.protocol === 'https:'
+    ? 'wss' : 'ws') + '://' + location.host + '/ws');
 
       var send = function(obj) {
         socket.send(JSON.stringify(obj))

@@ -1,7 +1,9 @@
 
 window._comm = {
   counter: 0,
-  requests: {}
+  requests: {},
+  connected: false,
+  buffer: []
 };
 
 var connect = function() {
@@ -13,7 +15,7 @@ var connect = function() {
     req.id = 'req' + ++window._comm.counter;
     var rec = { req: req };
     window._comm.requests[rec.req.id] = rec;
-    send(req);
+    send(JSON.stringify(req));
     return new Promise(function(resolve, reject) {
       rec.promise = {
         resolve: resolve,
@@ -22,11 +24,18 @@ var connect = function() {
     });
   };
 
-  var send = function(obj) {
-    socket.send(JSON.stringify(obj))
+  var send = function(json) {
+    if(!window._comm.connected)
+      window._comm.buffer.push(json);
+    else
+      socket.send(json);
   };
 
   socket.onopen = function() {
+    var b = window._comm.buffer;
+    while(b.length)
+      send(b.shift());
+    window._comm.connected = true;
     console.log('ws connected');
   };
 
@@ -35,6 +44,7 @@ var connect = function() {
   };
 
   socket.onclose = function(err) {
+    window._comm.connected = false;
     console.log('ws disconnected; reconnecting in 1s...');
     setTimeout(function() { connect(); }, 1000);
   };

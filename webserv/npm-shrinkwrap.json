@@ -5,7 +5,7 @@
   "requires": true,
   "dependencies": {
     "@cityofzion/neon-js": {
-      "version": "git://github.com/goldilockteam/neon-js.git#2bf128617a1b0fadf59af7c4ab50f9a7bffb9752",
+      "version": "git://github.com/goldilockteam/neon-js.git#4ca45bb8fffb98181f48e1cb1ccc7f43c2ccec06",
       "requires": {
         "axios": "0.18.0",
         "bignumber.js": "5.0.0",
