@@ -50,8 +50,8 @@ module.exports.plugins.unshift(
   new webpack.NormalModuleReplacementPlugin(
     // httpsOnly, signTx
     /^neon-js$/,
-    // path.join(__dirname, 'node_modules', '@cityofzion/neon-js')
-    __dirname + '/../../neon-js'
+    path.join(__dirname, 'node_modules', '@cityofzion/neon-js')
+    // __dirname + '/../../neon-js'
   )
 )
 
