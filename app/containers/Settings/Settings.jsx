@@ -214,7 +214,7 @@ export default class Settings extends Component<Props, State> {
               ))}
             </select>
           </div>
-          <div className='settingsItem'>
+          {/* <div className='settingsItem'>
             <div className='itemTitle'>Saved Wallet Accounts</div>
             {map(accounts, account => {
               return (
@@ -240,7 +240,7 @@ export default class Settings extends Component<Props, State> {
           </Button>
           <Button onClick={this.loadWalletRecovery}>
             Load wallet recovery file
-          </Button>
+          </Button> */}
         </div>
         <HomeButtonLink />
       </div>

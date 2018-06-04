@@ -58,6 +58,7 @@ export const MODAL_TYPES = {
 
 export const MAIN_NETWORK_ID = '1'
 export const TEST_NETWORK_ID = '2'
+export const GOLDI_NETWORK_ID = '3'
 
 // TestNet
 export const TOKENS_TEST = {
@@ -84,6 +85,10 @@ export const TOKENS = {
   MCT: 'a87cc2a513f5d8b4a42432343687c2127c60bc3f',
   GDM: 'd1e37547d88bc9607ff9d73116ebd9381c156f79',
   PKC: 'af7c7328eee5a275a3bcaee2bf0cf662b5e739be'
+}
+
+// GoldiNet
+export const TOKENS_GOLDI = {
 }
 
 export const ENDED_ICO_TOKENS = [

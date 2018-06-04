@@ -14,6 +14,8 @@ export const getExplorerBaseURL = (networkId: string, explorer: ExplorerType) =>
   } else if (explorer === EXPLORERS.NEO_SCAN) {
     if (isMainNetwork(networkId)) {
       baseURL = 'https://neoscan.io'
+    } else if (isGoldiNetwork(networkId)) {
+      baseURL = 'https://neo.goldilock.com'
     } else {
       baseURL = 'https://neoscan-testnet.io'
     }

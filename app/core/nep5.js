@@ -3,7 +3,7 @@ import { map } from 'lodash'
 
 import { toBigNumber } from './math'
 import { COIN_DECIMAL_LENGTH } from './formatters'
-import { TOKENS, TOKENS_TEST, MAIN_NETWORK_ID, TEST_NETWORK_ID } from './constants'
+import { TOKENS, TOKENS_TEST, TOKENS_GOLDI, MAIN_NETWORK_ID, TEST_NETWORK_ID, GOLDI_NETWORK_ID } from './constants'
 
 export const adjustDecimalAmountForTokenTransfer = (value: string): string =>
   toBigNumber(value).times(10 ** COIN_DECIMAL_LENGTH).round().toNumber()
@@ -25,6 +25,7 @@ export const getDefaultTokens = (): Array<TokenItemType> => {
 
   tokens.push(...map(TOKENS, (scriptHash, symbol) => getTokenEntry(symbol, scriptHash, MAIN_NETWORK_ID)))
   tokens.push(...map(TOKENS_TEST, (scriptHash, symbol) => getTokenEntry(symbol, scriptHash, TEST_NETWORK_ID)))
+  tokens.push(...map(TOKENS_GOLDI, (scriptHash, symbol) => getTokenEntry(symbol, scriptHash, GOLDI_NETWORK_ID)))
 
   return tokens
 }

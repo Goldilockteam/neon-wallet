@@ -19,7 +19,7 @@ const Home = () => (
         Login using an encrypted key
       </div>
     </Link>
-    <Link to={ROUTES.LOGIN_PRIVATE_KEY}>
+    {/* <Link to={ROUTES.LOGIN_PRIVATE_KEY}>
       <div className={classNames('linkBox', styles.linkBox)}>
         Login using a private key
       </div>
@@ -28,17 +28,17 @@ const Home = () => (
       <div className={classNames('linkBox', styles.linkBox)}>
         Login using a Ledger
       </div>
-    </Link>
+    </Link> */}
     <Link to={ROUTES.CREATE_WALLET}>
       <div className={classNames('linkBox', styles.linkBox, styles.linkBoxAlt)}>
         Create a new wallet
       </div>
     </Link>
-    <Link to={ROUTES.ENCRYPT_KEY}>
+    {/* <Link to={ROUTES.ENCRYPT_KEY}>
       <div className={classNames('linkBox', styles.linkBox, styles.linkBoxAlt)}>
         Encrypt an existing key
       </div>
-    </Link>
+    </Link> */}
     <Link to={ROUTES.SETTINGS}>
       <div className={classNames('linkBox', styles.linkBox, styles.linkBoxAlt)}>
         Manage Neon settings
