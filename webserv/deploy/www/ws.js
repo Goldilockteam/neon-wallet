@@ -54,6 +54,8 @@ var connect = function() {
 
   socket.onclose = function(err) {
     window._comm.connected = false;
+    // TODO send user to the front page to login again,
+    // the cached passphrase was lost at this point.
     console.log('ws disconnected; reconnecting in 1s...');
     setTimeout(function() { connect(); }, 1000);
   };

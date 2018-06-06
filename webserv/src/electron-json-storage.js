@@ -38,9 +38,6 @@ export const set = (key, json, options, callback) => {
   })
   .then(callback)
   .catch((err) => callback(err));
-
-  // TODO need to also remove pkeys from the 'json'
-  // if the key is 'userWallet'
 }
 
 export default {

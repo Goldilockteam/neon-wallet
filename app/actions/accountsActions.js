@@ -24,6 +24,10 @@ const walletHasKey = (wallet: Object, key: string) => {
   return wallet.accounts.some(account => account.key === key)
 }
 
+const walletHasAddress = (wallet: Object, address: string) => {
+  return wallet.accounts.some(account => account.address === address)
+}
+
 const walletHasLabel = (wallet: Object, label: string) => {
   return wallet.accounts.some(account => account.label === label)
 }
@@ -53,7 +57,7 @@ export const saveAccountActions = createActions(ID, ({ label, address, key }: Ob
 
   const wallet = await getWallet()
 
-  if (walletHasKey(wallet, key)) {
+  if (walletHasAddress(wallet, address)) {
     throw new Error(`Address '${address}' already exists.`)
   }
 

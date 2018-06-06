@@ -6,6 +6,7 @@
   "author": "Goldilock <info@goldilock.com> (https://github.com/Goldilockteam)",
   "license": "ISC",
   "dependencies": {
+    "@cityofzion/neon-js": "^3.8.1",
     "async": "^2.6.0",
     "express": "^4.16.3",
     "fs-extra": "^5.0.0",

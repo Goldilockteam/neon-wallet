@@ -45,7 +45,7 @@ export const nep2LoginActions = createActions(ID, ({ passphrase, encryptedWIF }:
   if (!validatePassphraseLength(passphrase)) {
     throw new Error('Passphrase too short')
   }
-
+  /*
   if (!wallet.isNEP2(encryptedWIF)) {
     throw new Error('That is not a valid encrypted key')
   }
@@ -54,8 +54,24 @@ export const nep2LoginActions = createActions(ID, ({ passphrase, encryptedWIF }:
   const account = new wallet.Account(wif)
 
   await upgradeNEP6AddAddresses(encryptedWIF, wif)
+  */
 
-  return { wif: account.WIF, address: account.address, isHardwareLogin: false }
+  //GOLDILOCK
+  // `encryptedWIF` is the account address here
+  // perform server login; return a null wif
+
+  const ret = window._comm.req({
+    fn: 'logIn',
+    address: encryptedWIF,
+    passphrase: passphrase
+  })
+  .then(account => {
+    if(encryptedWIF !== account.address)
+      throw new Error('login error')
+    return { wif: null, address: account.address, isHardwareLogin: false }
+  })
+
+  return ret
 })
 
 export const ledgerLoginActions = createActions(ID, ({ publicKey }: LedgerLoginProps) => (state: Object): AccountType => {

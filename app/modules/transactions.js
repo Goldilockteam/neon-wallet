@@ -94,7 +94,7 @@ export const sendTransaction = (sendEntries: Array<SendEntryType>) => async (
   getState: GetStateType
 ): Promise<*> => {
   const state = getState()
-  const wif = getWIF(state)
+  // const wif = getWIF(state)
   const fromAddress = getAddress(state)
   const net = getNetwork(state)
   const tokenBalances = getTokenBalances(state)
@@ -125,6 +125,14 @@ export const sendTransaction = (sendEntries: Array<SendEntryType>) => async (
       })
     )
   }
+  else {
+    dispatch(
+      showInfoNotification({
+        message: 'Please authorize the transaction on your smartphone',
+        autoDismiss: 0
+      })
+    )
+  }
 
   try {
     const { response } = await makeRequest(sendEntries, {
@@ -132,7 +140,7 @@ export const sendTransaction = (sendEntries: Array<SendEntryType>) => async (
       tokensBalanceMap,
       address: fromAddress,
       publicKey,
-      privateKey: new wallet.Account(wif).privateKey,
+      // privateKey: new wallet.Account(wif).privateKey,
       signingFunction: isHardwareSend ? signingFunction : null
     })
 

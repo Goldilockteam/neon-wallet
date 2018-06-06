@@ -14,12 +14,12 @@ const Home = () => (
         Login using a saved wallet
       </div>
     </Link>
-    <Link to={ROUTES.LOGIN_NEP2}>
+    {/* <Link to={ROUTES.LOGIN_NEP2}>
       <div className={classNames('linkBox', styles.linkBox)}>
         Login using an encrypted key
       </div>
     </Link>
-    {/* <Link to={ROUTES.LOGIN_PRIVATE_KEY}>
+    <Link to={ROUTES.LOGIN_PRIVATE_KEY}>
       <div className={classNames('linkBox', styles.linkBox)}>
         Login using a private key
       </div>

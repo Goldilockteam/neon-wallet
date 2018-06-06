@@ -40,7 +40,7 @@ export default class LoginLocalStorage extends Component<Props, State> {
           >
             <option value=''>Select a wallet</option>
             {map(accounts, (account, index) => (
-              <option value={account.key} key={`wallet${account.label}`}>{account.label}</option>
+              <option value={account.address} key={`wallet${account.label}`}>{account.label}</option>
             ))}
           </select>
           <div className={loginStyles.loginForm}>

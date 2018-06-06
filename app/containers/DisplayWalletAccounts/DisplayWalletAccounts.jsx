@@ -44,9 +44,12 @@ class DisplayWalletAccounts extends Component<Props, State> {
     return (
       <div id='newWallet'>
         <div className='disclaimer'>
-          You must save and backup the keys below. If you lose them, you lose access to your assets.
-          You can click "Save Key" to save the encrypted key in local application storage.
-          Verify that you can log in to the account and see the correct public address before sending anything to the address below!
+          IMPORTANT - READ CAREFULLY:<br/>
+          After you press Save Account, your encrypted private key will be stored and protected by Goldilock.<br/>
+          Make sure to backup the passphrase, as your passphrase will never be stored by Goldilock, and if you lose it, Goldilock will not be able do decrypt your private key and you will lose access to your assets.<br/>
+          You can also save and backup the private key yourself, but Goldilock cannot protect and cannot be held accountable for key copies saved externally. Therefore, if you decide to backup your encrypted private key, choose your physical backup location very carefuly.
+          A backed-up encrypted private key, along with the passphrase, can be used to log into any stock Neon Wallet. This should only ever be done in the case of Goldilock not being able to provide its services anymore.<br/>
+          IMPORTANT: Verify that you can log in to the account and see the correct public address before sending anything to the address below!
         </div>
         <div className='addressBox'>
           <canvas ref={(node) => { this.publicCanvas = node }} />
@@ -73,11 +76,11 @@ class DisplayWalletAccounts extends Component<Props, State> {
             <span className='key'>{encryptedWIF}</span>
             <CopyToClipboard text={encryptedWIF} tooltip='Copy Encrypted Key' />
           </div>
-          <div className='keyListItem'>
+          {/* <div className='keyListItem'>
             <span className='label'>Private Key:</span>
             <span className='key'>{wif}</span>
             <CopyToClipboard text={wif} tooltip='Copy Private Key' />
-          </div>
+          </div> */}
         </div>
         <div className='saveAccount'>
           <input autoFocus type='text' placeholder='Name this account' value={keyName} onChange={(e) => this.setState({ keyName: e.target.value })} />
