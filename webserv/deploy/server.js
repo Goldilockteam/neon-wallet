@@ -157,7 +157,7 @@ wss.on('connection', (ws) => {
               const newWallet = msg.val
               // is there an existing wallet already saved
               const curWallet = await load(msg.key)
-              if(curWallet) {
+              if(curWallet && curWallet.accounts) {
                 // existing wallet, perform merge
                 curAccByAddr = {}
                 curWallet.accounts.forEach(curAcc => curAccByAddr[curAcc.address] = curAcc)
