@@ -152,6 +152,9 @@ export const sendTransaction = (sendEntries: Array<SendEntryType>) => async (
       message: 'Transaction complete! Your balance will automatically update when the blockchain has processed it.'
     }))
   } catch (err) {
+    console.log(err)
+    if(err.stack)
+      console.log(err.stack)
     return rejectTransaction(`Transaction failed: ${err.message}`)
   }
 }

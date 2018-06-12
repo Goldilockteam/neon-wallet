@@ -9,6 +9,17 @@ const moment = require('moment')
 const WebSocket = require('ws')
 const electronJsonStorage = require('./electron-json-storage')
 const neonjs = require('@cityofzion/neon-js')
+// const util = require('util')
+// const pify = require('pify')
+const {promisify} = require('es6-promisify')
+// const authy = pify(require('authy')(args.authy))
+const authy = require('authy')(args.authy)
+
+const authy_register_user = promisify(authy.register_user.bind(authy))
+const authy_send_approval_request = promisify(authy.send_approval_request.bind(authy))
+const authy_check_approval_status = promisify(authy.check_approval_status.bind(authy))
+
+const LOCAL_USER = 'goldi.neon.LocalUser'
 
 const server = args.cert ?
   https.createServer({
@@ -23,6 +34,17 @@ const wss = new WebSocket.Server({ server: server, path: '/ws' })
 
 fse.ensureDirSync(args.walletdir)
 const ejsOpts = { dataPath: args.walletdir }
+
+const save = (key, val) => {
+  return new Promise((resolve, reject) => {
+    electronJsonStorage.set(key, val, ejsOpts, (err) => {
+      if(err)
+        reject(err)
+      else
+        resolve()
+    })
+  })
+}
 
 const load = (key) => {
   return new Promise((resolve, reject) =>
@@ -50,7 +72,23 @@ const loadAccount = async (address) => {
 
 wss.on('connection', (ws) => {
 
+  console.log(`ws client connected`)
+
   let passphraseCache = null
+  let checkAuthyInterval = null
+
+  const cancelAuthyPolling = () => {
+    if(checkAuthyInterval)
+      clearInterval(checkAuthyInterval)
+    checkAuthyInterval = null
+  }
+
+  ws.on('error', (e) => {
+    passphraseCache = null
+    authyRequests = {}
+    cancelAuthyPolling()
+    console.log(`ws client disconnected; error: ${e}`)
+  })
 
   const wsSend = (obj) => {
     return new Promise((resolve, reject) => {
@@ -62,7 +100,7 @@ wss.on('connection', (ws) => {
       })
     })
   }
-  const store = (msg) => {
+  const storeAndSend = (msg) => {
     return new Promise((resolve, reject) => {
       electronJsonStorage.set(msg.key, msg.val, ejsOpts, err =>
         resolve(wsSend({ id: msg.id, err: err }))
@@ -133,19 +171,19 @@ wss.on('connection', (ws) => {
                 })
                 Object.entries(curAccByAddr).forEach(e =>
                   console.log(`saving new account (merge): ${e[0]}`))
-                await store(msg)
+                await storeAndSend(msg)
               }
               else {
                 // no previous wallet, perform direct save
                 newWallet.accounts.forEach(acc =>
                   console.log(`saving new account (direct): ${acc.address}`))
-                await store(msg);
+                await storeAndSend(msg);
               }
             }
           }
           else {
             // not a wallet, just store the object
-            await store(msg);
+            await storeAndSend(msg);
           }
           break
         }
@@ -177,15 +215,96 @@ wss.on('connection', (ws) => {
           const account = await loadAccount(msg.address)
           const tx = neonjs.tx.deserializeTransaction(msg.tx)
 
-          const privateKey = neonjs.wallet.decrypt(account.key, passphraseCache)
+          const privateKey2 = neonjs.wallet.decrypt(account.key, passphraseCache)
 
-          // TODO Authy.confirm [timeout]
+          const privateKey = new neonjs.wallet.Account(privateKey2).privateKey
 
-          const signedTx = neonjs.tx.signTransaction(tx, privateKey)
-          const serializedSignedTx = neonjs.tx.serializeTransaction(signedTx, true)
+          // ----------------------------------------------------------------
 
-          await wsSend({ id: msg.id, data: serializedSignedTx })
+          // init the local user with Authy info, if wasn't regged yet
+          let localUser = await load(LOCAL_USER)
 
+          if(!localUser || !localUser.authy) {
+
+            console.log(`registering new authy user; email: ${args.userEmail};
+              cell: ${args.userCell}; country: ${args.userCellCountry}`)
+
+            const reg_user_res = await authy_register_user(
+              args.userEmail, args.userCell, args.userCellCountry)
+            // res = {user: {id: 1337}}
+
+            if(!localUser)
+              localUser = {}
+            localUser.authy = reg_user_res.user // .authy.id
+            await save(LOCAL_USER, localUser)
+            console.log(`saved local user:`)
+            console.dir(localUser)
+          }
+
+          const address = 'address'
+          const amount = 123.45
+          const currency = 'NEO'
+          const message = `Send ${amount} ${currency} to ${address}?`
+
+          console.log(`sending approval request for user id ${localUser.authy.id}`)
+          const resApprovalReq = await authy_send_approval_request(
+            localUser.authy.id, { message: message }, null, null)
+          // res = {
+          //  approval_request: {"uuid":"########-####-####-####-############"},
+          //  success: true
+          // }
+
+          const approvalUuid = resApprovalReq.approval_request.uuid
+
+          console.log(`starting polling for authy approval request ${approvalUuid}`)
+
+          const checkAuthyApproval = async () => {
+            const res_approval_status =
+              await authy_check_approval_status(approvalUuid)
+            // res = {
+            //   "approval_request": {
+            //     "_app_name": YOUR_APP_NAME,
+            //     "_app_serial_id": APP_SERIAL_ID,
+            //     "_authy_id": AUTHY_ID,
+            //     "_id": INTERNAL_ID,
+            //     "_user_email": EMAIL_ID,
+            //     "app_id": APP_ID,
+            //     "created_at": TIME_STAMP,
+            //     "notified": false,
+            //     "processed_at": null,
+            //     "seconds_to_expire": 600,
+            //     "status": 'pending',
+            //     "updated_at": TIME_STAMP,
+            //     "user_id": USER_ID,
+            //     "uuid": UUID
+            //   },
+            //   "success": true
+            // }
+
+            const stat = res_approval_status.approval_request.status
+
+            if(stat === 'approved') {
+              cancelAuthyPolling()
+              console.log(`authy request ${approvalUuid} approved, signing the transaction`)
+              const signedTx = neonjs.tx.signTransaction(tx, privateKey)
+              const serializedSignedTx = neonjs.tx.serializeTransaction(signedTx, true)
+              await wsSend({ id: msg.id, data: serializedSignedTx })
+            }
+            else if(stat === 'denied') {
+              cancelAuthyPolling()
+              console.log(`authy request ${approvalUuid} denied; cancel polling`)
+              await wsSend({ id: msg.id, err: 'Transaction was denied.' })
+            }
+            else if(stat === 'pending') {
+              console.log(`authy request ${approvalUuid} pending`)
+            }
+          }
+
+          if(checkAuthyInterval)
+            clearInterval(checkAuthyInterval)
+          checkAuthyInterval = setInterval(checkAuthyApproval, 2000)
+
+          // ----------------------------------------------------------------
           break;
         }
       }
@@ -193,7 +312,7 @@ wss.on('connection', (ws) => {
     }
     catch(e) {
       console.log(`request error: ${msg.fn} ${msg.id} ${e.stack || e}`)
-      wsSend({ id: msg.id, err: e })
+      wsSend({ id: msg.id, err: e.stack })
     }
   })
 })

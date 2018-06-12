@@ -54,18 +54,18 @@ var connect = function() {
 
   socket.onclose = function(err) {
     window._comm.connected = false;
-    // TODO send user to the front page to login again,
-    // the cached passphrase was lost at this point.
-    console.log('ws disconnected; reconnecting in 1s...');
-    setTimeout(function() { connect(); }, 1000);
+    // TODO display a dialog before redirecting
+    window.location.href = '/'
   };
 
   socket.onmessage = function(packet) {
     console.log(packet.data);
     var msg = JSON.parse(packet.data);
     var rec = window._comm.requests[msg.id];
-    if(!rec)
+    if(!rec) {
+      console.dir(msg)
       return console.error('unknown response id: ' + msg.id);
+    }
     window._comm.requests[msg.id] = undefined;
     if(msg.err)
       rec.promise.reject(new Error(msg.err));
