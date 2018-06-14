@@ -3,9 +3,12 @@ import { wallet } from 'neon-js'
 import { noop } from 'lodash'
 import { createActions } from 'spunky'
 
-import { upgradeNEP6AddAddresses } from '../core/account'
+import { upgradeNEP6AddAddresses, saveAccount } from '../core/account'
 import { validatePassphraseLength } from '../core/wallet'
 import { ledgerNanoSCreateSignatureAsync } from '../ledger/ledgerNanoS'
+import { ROUTES } from '../core/constants'
+
+import { newWalletAccount } from '../modules/generateWallet'
 
 type WifLoginProps = {
   wif: string
@@ -18,7 +21,9 @@ type LedgerLoginProps = {
 
 type Nep2LoginProps = {
   passphrase: string,
-  encryptedWIF: string
+  encryptedWIF: string,
+  label?: string,
+  callback?: Function
 }
 
 type AccountType = ?{
@@ -41,7 +46,7 @@ export const wifLoginActions = createActions(ID, ({ wif }: WifLoginProps) => (st
   return { wif: account.WIF, address: account.address, isHardwareLogin: false }
 })
 
-export const nep2LoginActions = createActions(ID, ({ passphrase, encryptedWIF }: Nep2LoginProps) => async (state: Object): Promise<AccountType> => {
+export const nep2LoginActions = createActions(ID, ({ passphrase, encryptedWIF, label, callback }: Nep2LoginProps) => async (state: Object): Promise<AccountType> => {
   if (!validatePassphraseLength(passphrase)) {
     throw new Error('Passphrase too short')
   }
@@ -52,6 +57,21 @@ export const nep2LoginActions = createActions(ID, ({ passphrase, encryptedWIF }:
 
   const wif = wallet.decrypt(encryptedWIF, passphrase)
   const account = new wallet.Account(wif)
+  const { address } = account
+  let accounts
+  if (label) {
+    try {
+      accounts = await saveAccount(label, address, encryptedWIF)
+      // Execute on next thread
+      await setTimeout(() => {
+        callback && callback(accounts)
+      }, 100)
+    } catch (error) {
+      if (error.message !== `Address '${address}' already exists.`) {
+        throw error
+      }
+    }
+  }
 
   await upgradeNEP6AddAddresses(encryptedWIF, wif)
   */
@@ -72,7 +92,36 @@ export const nep2LoginActions = createActions(ID, ({ passphrase, encryptedWIF }:
   })
 
   return ret
-})
+
+
+export const nep2DetailsLoginActions = (passphrase: string, encryptedWIF: string, history: Object) => (dispatch: DispatchType): Promise<*> => {
+  return new Promise((resolve, reject) => {
+    if (!validatePassphraseLength(passphrase)) {
+      reject(new Error('Passphrase too short'))
+    }
+
+    if (!wallet.isNEP2(encryptedWIF)) {
+      reject(new Error('That is not a valid encrypted key'))
+    }
+
+    try {
+      const wif = wallet.decrypt(encryptedWIF, passphrase)
+      const account = new wallet.Account(wif)
+      const { address } = account
+
+      dispatch(newWalletAccount({
+        wif,
+        address,
+        passphrase,
+        encryptedWIF
+      }))
+      history.push(ROUTES.DISPLAY_WALLET_KEYS)
+      resolve()
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
 
 export const ledgerLoginActions = createActions(ID, ({ publicKey }: LedgerLoginProps) => (state: Object): AccountType => {
   const publicKeyEncoded = wallet.getPublicKeyEncoded(publicKey)

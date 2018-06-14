@@ -13,7 +13,8 @@ type Props = {
   wif: string,
   encryptedWIF: string,
   passphrase: string,
-  history: Object
+  history: Object,
+  isSaved?: boolean
 }
 
 type State = {
@@ -26,20 +27,24 @@ class DisplayWalletAccounts extends Component<Props, State> {
   }
 
   publicCanvas: ?HTMLCanvasElement
+  encryptedCanvas: ?HTMLCanvasElement
   privateCanvas: ?HTMLCanvasElement
 
   componentDidMount () {
-    const { address, encryptedWIF } = this.props
+    const { address, encryptedWIF, wif } = this.props
     QRCode.toCanvas(this.publicCanvas, address, { version: 5 }, (err) => {
       if (err) console.log(err)
     })
-    QRCode.toCanvas(this.privateCanvas, encryptedWIF, { version: 5 }, (err) => {
+    QRCode.toCanvas(this.encryptedCanvas, encryptedWIF, { version: 5 }, (err) => {
+      if (err) console.log(err)
+    })
+    QRCode.toCanvas(this.privateCanvas, wif, { version: 5 }, (err) => {
       if (err) console.log(err)
     })
   }
 
   render () {
-    const { passphrase, address, encryptedWIF, wif, saveAccount } = this.props
+    const { passphrase, address, encryptedWIF, wif, saveAccount, isSaved } = this.props
     const { keyName } = this.state
     return (
       <div id='newWallet'>
@@ -51,13 +56,19 @@ class DisplayWalletAccounts extends Component<Props, State> {
           A backed-up encrypted private key, along with the passphrase, can be used to log into any stock Neon Wallet. This should only ever be done in the case of Goldilock not being able to provide its services anymore.<br/>
           IMPORTANT: Verify that you can log in to the account and see the correct public address before sending anything to the address below!
         </div>
-        <div className='addressBox'>
-          <canvas ref={(node) => { this.publicCanvas = node }} />
-          <div>Public Address</div>
-        </div>
-        <div className='privateKeyBox'>
-          <canvas ref={(node) => { this.privateCanvas = node }} />
-          <div>Encrypted Private Key</div>
+        <div className='qrcode-container'>
+          <div className='addressBox'>
+            <canvas ref={(node) => { this.publicCanvas = node }} />
+            <div>Public Address</div>
+          </div>
+          <div className='encryptedKeyBox'>
+            <canvas ref={(node) => { this.encryptedCanvas = node }} />
+            <div>Encrypted Key</div>
+          </div>
+          <div className='privateKeyBox'>
+            <canvas ref={(node) => { this.privateCanvas = node }} />
+            <div>Private Key</div>
+          </div>
         </div>
         <div className='keyList'>
           <div className='keyListItem'>
@@ -82,10 +93,14 @@ class DisplayWalletAccounts extends Component<Props, State> {
             <CopyToClipboard text={wif} tooltip='Copy Private Key' />
           </div> */}
         </div>
-        <div className='saveAccount'>
-          <input autoFocus type='text' placeholder='Name this account' value={keyName} onChange={(e) => this.setState({ keyName: e.target.value })} />
-          <Button onClick={() => saveAccount(keyName, address, encryptedWIF)}>Save Account</Button>
-        </div>
+        {(() => {
+          return !isSaved && (
+            <div className='saveAccount'>
+              <input autoFocus type='text' placeholder='Name this account' value={keyName} onChange={(e) => this.setState({ keyName: e.target.value })} />
+              <Button onClick={() => saveAccount(keyName, address, encryptedWIF)}>Save Account</Button>
+            </div>
+          )
+        })()}
         <Button onClick={this.handleBack}>Back</Button>
         <Button onClick={this.handlePrint}>Print</Button>
       </div>
