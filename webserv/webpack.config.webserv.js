@@ -56,4 +56,4 @@ module.exports.plugins.unshift(
 )
 
 // dev
-_.remove(module.exports.plugins, v => v instanceof UglifyJSPlugin)
+// _.remove(module.exports.plugins, v => v instanceof UglifyJSPlugin)
