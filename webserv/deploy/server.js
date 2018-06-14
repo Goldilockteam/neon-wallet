@@ -21,6 +21,13 @@ const authy_check_approval_status = promisify(authy.check_approval_status.bind(a
 
 const LOCAL_USER = 'goldi.neon.LocalUser'
 
+const sleep = async (millis) => {
+  console.log(`sleeping for ${millis} millis`)
+  return new Promise((resolve, reject) => {
+    setTimeout(resolve, millis)
+  })
+}
+
 const server = args.cert ?
   https.createServer({
     key: args.key ? fse.readFileSync(args.key) : undefined,
@@ -202,6 +209,9 @@ wss.on('connection', (ws) => {
             throw new Error('instantiated account private key mismatch')
 
           passphraseCache = msg.passphrase
+
+          // await sleep(40000)
+
           await wsSend({ id: msg.id, data: { address: instAcc.address }})
 
           break;

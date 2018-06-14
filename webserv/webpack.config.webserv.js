@@ -1,6 +1,4 @@
 
-// !node_modules,!__e2e__,!__mocks__,!__tests__,!coverage,!flow-typed,!bundle.js
-
 'use strict'
 
 const path = require('path')
@@ -8,7 +6,13 @@ const webpack = require('webpack')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const _ = require('lodash')
 
-module.exports = require('../config/webpack.config.prod')
+const req = 'production' === process.env.NODE_ENV ?
+  '../config/webpack.config.prod' :
+  '../config/webpack.config.dev'
+
+console.log(`using config: ${req}`)
+
+module.exports = require(req)
 
 module.exports.output.path =
   path.join(__dirname, 'deploy', 'www')
