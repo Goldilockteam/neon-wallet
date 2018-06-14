@@ -429,6 +429,11 @@
   position: relative;
   padding-top: 5px;
   min-height: 125px;
+}
+
+.cL7xcVNglLcyC4BNejzAK {
+  color: red;
+  text-align: center;
 }._3ttk3tvB89kvFhJpbspV1s {
   padding-bottom: 5px;
 }
@@ -682,6 +687,42 @@
 
 .fu9ENN6-DDxd57V-l5Yjg {
   padding-bottom: 30px;
+}._3LPlQI1vW4EPNyBF1ELoj7 {
+  padding-top: 20px;
+  text-align: right;
+}
+
+._3MIJnUE9gRnJD7e-j_eGsy {
+  background: none;
+  border: 1px solid #999;
+  color: #000;
+}
+
+._3MIJnUE9gRnJD7e-j_eGsy:hover {
+  background: none;
+}
+
+.ebRY70y6_wlDW36dysfik {
+  color: red;
+  float: left;
+  padding-top: 7px;
+}.M9ivwxT93Ktr3VeaD5DV2 {
+  width: 100%;
+  position: relative;
+}
+
+.M9ivwxT93Ktr3VeaD5DV2 input {
+  width: 100%;
+  margin-bottom: 10px;
+  padding-right: 40px;
+  box-sizing: border-box;
+}
+
+.M9ivwxT93Ktr3VeaD5DV2 ._2fdZvohRcBA6xP6pE2vXr7 {
+  position: absolute;
+  cursor: pointer;
+  top: 11px;
+  right: 14px;
 }._3wJgrkoXqeThRLrNlu922 {
   font-size: 1.5em;
   cursor: pointer;
@@ -716,22 +757,27 @@
 }._1To4FABIljVS1nEboh9sYA {
   text-align: center;
   vertical-align: middle;
-}.M9ivwxT93Ktr3VeaD5DV2 {
+}._14OSwx7PLSzIkKcJ-fX-oE {
+  display: flex;
+  position: absolute;
+  flex-direction: column;
+  text-align: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}._3cY43_AmTlGVqeD15yr9yG {
+  float: right;
+}
+
+._3cY43_AmTlGVqeD15yr9yG ._3lZhV8OjVC5ZzZjK6dmf0c {
+  position: absolute;
+  right: 0;
+  top: 10%;
   width: 100%;
-  display: inline-block;
-}
-
-.M9ivwxT93Ktr3VeaD5DV2 input {
-  width: 95%;
-  float: left;
-  margin-bottom: 10px;
-}
-
-.M9ivwxT93Ktr3VeaD5DV2 ._2fdZvohRcBA6xP6pE2vXr7 {
-  position: relative;
-  cursor: pointer;
-  margin-left: -25px;
-  margin-top: 10px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: -1;
 }.AIV45c4Mb8Jn63L7oR0yv {
   width: 960px;
   margin: 20px auto 20px auto;
@@ -760,6 +806,11 @@
 
 .AIV45c4Mb8Jn63L7oR0yv ._2-BdTHqsWIMsX0QidrcQlv select {
   margin-bottom: 10px;
+}
+
+.AIV45c4Mb8Jn63L7oR0yv ._2-BdTHqsWIMsX0QidrcQlv .hwnH3o41VaGtTzbyX1Jh1 {
+  width: 300px;
+  margin-left: 20px;
 }._1e6GVEQXm61xJk4kfAWNFE {
   color: #3063c9;
   cursor: pointer;
@@ -840,6 +891,12 @@
   right: 0;
   left: auto;
   top: -5px;
+}.TlULioyv8JJUByc7SO_8f {
+  display: flex;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }._2LaeqCmSJSw56STCreG_40 {
   padding-top: 10px;
 }
@@ -893,6 +950,11 @@
 
 .iNg4qQAWBenV_GubiiH3h {
   padding-right: 5px;
+}
+
+.f1X_Tkn7uIfJwZvcS2bmf {
+  color: red;
+  text-align: center;
 }._1WvefxBMIkG1LDUFzZbg4V {
   height: 100%;
 }
@@ -948,6 +1010,7 @@
 
 ._2GN6TUti8higLQEkH9IDrX {
   border-left: 1.5px solid #efefef;
+  position: relative;
 }
 
 ._2DqWtCLj99Aln23Sry489S {
@@ -956,6 +1019,15 @@
   padding: 16px 0px;
   font-weight: 200;
   font-size: 1.2em;
+}
+
+._2K7z8HKf_k_vYcAgD62XtF {
+  opacity: 0.5;
+  cursor: default;
+}
+
+._2K7z8HKf_k_vYcAgD62XtF:hover {
+  background-color: #4d933b;
 }._3mwUIJ7CRBUWIMqXFUrO6y {
   margin-bottom: 10px;
 }._1sN6EaJimZDN9ZaL1CzSJu {
@@ -1066,9 +1138,11 @@ input :focus {
 
 #settings .walletName,
 #settings .walletKey,
+#settings .walletCredentials,
 #settings .deleteWallet,
 #tokenSale .walletName,
 #tokenSale .walletKey,
+#tokenSale .walletCredentials,
 #tokenSale .deleteWallet {
   display: inline-block;
   margin-right: 10px;
@@ -1086,22 +1160,28 @@ input :focus {
   font-family: 'courier', monospace;
 }
 
+#settings .walletCredentials,
+#settings .deleteWallet,
+#tokenSale .walletCredentials,
+#tokenSale .deleteWallet {
+  opacity: 0.6;
+  cursor: pointer;
+}
+
 #settings .deleteWallet,
 #tokenSale .deleteWallet {
   width: 10%;
-  opacity: 0.6;
-  cursor: pointer;
+}
+
+#settings .walletCredentials,
+#tokenSale .walletCredentials {
+  width: 5%;
 }
 
 #tokenSale .warning {
   background-color: red;
   color: white;
   padding: 5px;
-  margin-bottom: 10px;
-}
-
-#newWallet input {
-  width: 95%;
   margin-bottom: 10px;
 }
 
@@ -1120,20 +1200,16 @@ input :focus {
   font-weight: 200;
 }
 
+#newWallet .qrcode-container {
+  display: flex;
+}
+
 #newWallet .addressBox,
+#newWallet .encryptedKeyBox,
 #newWallet .privateKeyBox {
   margin-bottom: 20px;
-  display: inline-block;
-  width: 40%;
+  flex: 1;
   text-align: center;
-}
-
-#newWallet .addressBox {
-  margin-right: 9%;
-}
-
-#newWallet .privateKeyBox {
-  margin-left: 9%;
 }
 
 #newWallet .keyList {

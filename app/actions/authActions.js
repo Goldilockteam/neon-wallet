@@ -92,7 +92,7 @@ export const nep2LoginActions = createActions(ID, ({ passphrase, encryptedWIF, l
   })
 
   return ret
-
+})
 
 export const nep2DetailsLoginActions = (passphrase: string, encryptedWIF: string, history: Object) => (dispatch: DispatchType): Promise<*> => {
   return new Promise((resolve, reject) => {
