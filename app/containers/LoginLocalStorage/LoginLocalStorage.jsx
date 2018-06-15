@@ -27,7 +27,7 @@ export default class LoginLocalStorage extends Component<Props, State> {
 
   render () {
     const { accounts } = this.props
-    const { passphrase, encryptedWIF } = this.state
+    const { passphrase, encryptedWIF, disableLoginButton } = this.state
 
     return (
       <div id='loginPage' className={loginStyles.loginPage}>
@@ -52,7 +52,7 @@ export default class LoginLocalStorage extends Component<Props, State> {
             />
           </div>
           <div>
-            <Button type='submit' disabled={!this.isValid()}>Login</Button>
+            <Button type='submit' disabled={!this.isValid() || disableLoginButton}>Login</Button>
             <HomeButtonLink />
           </div>
         </form>
@@ -65,6 +65,11 @@ export default class LoginLocalStorage extends Component<Props, State> {
     const { passphrase, encryptedWIF } = this.state
 
     event.preventDefault()
+
+    this.setState({
+      disableLoginButton: true
+    })
+
     loginNep2(passphrase, encryptedWIF)
   }
 

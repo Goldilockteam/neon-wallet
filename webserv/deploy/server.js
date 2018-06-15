@@ -9,17 +9,13 @@ const moment = require('moment')
 const WebSocket = require('ws')
 const electronJsonStorage = require('./electron-json-storage')
 const neonjs = require('@cityofzion/neon-js')
-// const util = require('util')
-// const pify = require('pify')
 const {promisify} = require('es6-promisify')
-// const authy = pify(require('authy')(args.authy))
 const authy = require('authy')(args.authy)
+const {timeSpan} = require('utilz')
 
 const authy_register_user = promisify(authy.register_user.bind(authy))
 const authy_send_approval_request = promisify(authy.send_approval_request.bind(authy))
 const authy_check_approval_status = promisify(authy.check_approval_status.bind(authy))
-
-const LOCAL_USER = 'goldi.neon.LocalUser'
 
 const sleep = async (millis) => {
   console.log(`sleeping for ${millis} millis`)
@@ -81,7 +77,7 @@ wss.on('connection', (ws) => {
 
   console.log(`ws client connected`)
 
-  let passphraseCache = null
+  let pkeyCache = null
   let checkAuthyInterval = null
 
   const cancelAuthyPolling = () => {
@@ -91,7 +87,7 @@ wss.on('connection', (ws) => {
   }
 
   ws.on('error', (e) => {
-    passphraseCache = null
+    pkeyCache = null
     authyRequests = {}
     cancelAuthyPolling()
     console.log(`ws client disconnected; error: ${e}`)
@@ -202,13 +198,16 @@ wss.on('connection', (ws) => {
 
           const account = await loadAccount(msg.address)
 
+          const t = Date.now()
           const wif = neonjs.wallet.decrypt(account.key, msg.passphrase)
+          console.log(`login wallet.decrypt took ${timeSpan(Date.now() - t)}`)
+
           const instAcc = new neonjs.wallet.Account(wif)
 
           if(msg.address !== instAcc.address)
             throw new Error('instantiated account private key mismatch')
 
-          passphraseCache = msg.passphrase
+          pkeyCache = instAcc.privateKey
 
           // await sleep(40000)
 
@@ -219,46 +218,27 @@ wss.on('connection', (ws) => {
 
         case 'signTx': {
 
-          if(!passphraseCache)
-            throw new Error('no cached passphrase')
+          if(!pkeyCache)
+            throw new Error('no cached pkey')
 
           const account = await loadAccount(msg.address)
           const tx = neonjs.tx.deserializeTransaction(msg.tx)
 
-          const privateKey2 = neonjs.wallet.decrypt(account.key, passphraseCache)
-
-          const privateKey = new neonjs.wallet.Account(privateKey2).privateKey
+          // let t = Date.now()
+          // const privateKey2 = neonjs.wallet.decrypt(account.key, passphraseCache)
+          // console.log(`tx.sign wallet.decrypt took ${timeSpan(Date.now() - t)}`)
+          // const privateKey = new neonjs.wallet.Account(privateKey2).privateKey
 
           // ----------------------------------------------------------------
 
-          // init the local user with Authy info, if wasn't regged yet
-          let localUser = await load(LOCAL_USER)
-
-          if(!localUser || !localUser.authy) {
-
-            console.log(`registering new authy user; email: ${args.userEmail};
-              cell: ${args.userCell}; country: ${args.userCellCountry}`)
-
-            const reg_user_res = await authy_register_user(
-              args.userEmail, args.userCell, args.userCellCountry)
-            // res = {user: {id: 1337}}
-
-            if(!localUser)
-              localUser = {}
-            localUser.authy = reg_user_res.user // .authy.id
-            await save(LOCAL_USER, localUser)
-            console.log(`saved local user:`)
-            console.dir(localUser)
-          }
-
-          const address = 'address'
-          const amount = 123.45
+          const address = 'address' // can be multiple; don't mention our own
+          const amount = 123.45 // sum the foreign outputs
           const currency = 'NEO'
           const message = `Send ${amount} ${currency} to ${address}?`
 
-          console.log(`sending approval request for user id ${localUser.authy.id}`)
+          console.log(`sending approval request for user id ${args.authyUserId}`)
           const resApprovalReq = await authy_send_approval_request(
-            localUser.authy.id, { message: message }, null, null)
+            args.authyUserId, { message: message }, null, null)
           // res = {
           //  approval_request: {"uuid":"########-####-####-####-############"},
           //  success: true
@@ -268,7 +248,10 @@ wss.on('connection', (ws) => {
 
           console.log(`starting polling for authy approval request ${approvalUuid}`)
 
+          let txActioned = false
+
           const checkAuthyApproval = async () => {
+
             const res_approval_status =
               await authy_check_approval_status(approvalUuid)
             // res = {
@@ -291,16 +274,25 @@ wss.on('connection', (ws) => {
             //   "success": true
             // }
 
+            if(txActioned)
+              return
+
             const stat = res_approval_status.approval_request.status
 
             if(stat === 'approved') {
+              txActioned = true
               cancelAuthyPolling()
               console.log(`authy request ${approvalUuid} approved, signing the transaction`)
-              const signedTx = neonjs.tx.signTransaction(tx, privateKey)
+
+              t = Date.now()
+              const signedTx = neonjs.tx.signTransaction(tx, pkeyCache)
+              console.log(`tx.sign took ${timeSpan(Date.now() - t)}`)
+
               const serializedSignedTx = neonjs.tx.serializeTransaction(signedTx, true)
               await wsSend({ id: msg.id, data: serializedSignedTx })
             }
             else if(stat === 'denied') {
+              txActioned = true
               cancelAuthyPolling()
               console.log(`authy request ${approvalUuid} denied; cancel polling`)
               await wsSend({ id: msg.id, err: 'Transaction was denied.' })
@@ -310,8 +302,7 @@ wss.on('connection', (ws) => {
             }
           }
 
-          if(checkAuthyInterval)
-            clearInterval(checkAuthyInterval)
+          cancelAuthyPolling()
           checkAuthyInterval = setInterval(checkAuthyApproval, 2000)
 
           // ----------------------------------------------------------------

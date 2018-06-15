@@ -72,6 +72,11 @@
       "resolved": "https://registry.npmjs.org/async-limiter/-/async-limiter-1.0.0.tgz",
       "integrity": "sha512-jp/uFnooOiO+L211eZOoSyzpOITMXx1rBITauYykG3BRYPu8h0UcxsPNB04RR5vo4Tyz3+ay17tR6JVf9qzYWg=="
     },
+    "async-mini": {
+      "version": "0.2.0",
+      "resolved": "https://registry.npmjs.org/async-mini/-/async-mini-0.2.0.tgz",
+      "integrity": "sha1-3u/49viwN13TIgpNGdbMRlt1dFg="
+    },
     "asynckit": {
       "version": "0.4.0",
       "resolved": "https://registry.npmjs.org/asynckit/-/asynckit-0.4.0.tgz",
@@ -652,6 +657,11 @@
         "verror": "1.10.0"
       }
     },
+    "laeh2": {
+      "version": "0.3.3",
+      "resolved": "https://registry.npmjs.org/laeh2/-/laeh2-0.3.3.tgz",
+      "integrity": "sha1-bEPH3thgjxL9pHmvMdN9shZgk1U="
+    },
     "lodash": {
       "version": "4.17.10",
       "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.10.tgz",
@@ -802,11 +812,6 @@
       "version": "2.1.0",
       "resolved": "https://registry.npmjs.org/performance-now/-/performance-now-2.1.0.tgz",
       "integrity": "sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns="
-    },
-    "pify": {
-      "version": "3.0.0",
-      "resolved": "https://registry.npmjs.org/pify/-/pify-3.0.0.tgz",
-      "integrity": "sha1-5aSs0sEB/fPZpNB/DbxNtJ3SgXY="
     },
     "proxy-addr": {
       "version": "2.0.3",
@@ -1037,6 +1042,11 @@
         "mime-types": "~2.1.18"
       }
     },
+    "underscore": {
+      "version": "1.9.1",
+      "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.9.1.tgz",
+      "integrity": "sha512-5/4etnCkd9c8gwgowi5/om/mYO5ajCaOgdzj/oW+0eQV9WxKBDZw5+ycmKmeaTXjInS/W0BzpGLo2xR2aBwZdg=="
+    },
     "universalify": {
       "version": "0.1.1",
       "resolved": "https://registry.npmjs.org/universalify/-/universalify-0.1.1.tgz",
@@ -1051,6 +1061,16 @@
       "version": "1.0.1",
       "resolved": "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.1.tgz",
       "integrity": "sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM="
+    },
+    "utilz": {
+      "version": "0.1.14",
+      "resolved": "https://registry.npmjs.org/utilz/-/utilz-0.1.14.tgz",
+      "integrity": "sha1-Y7W2ubaoPsXT8mWM0FZRyZUoPJQ=",
+      "requires": {
+        "async-mini": "*",
+        "laeh2": "*",
+        "underscore": "*"
+      }
     },
     "uuid": {
       "version": "3.2.1",

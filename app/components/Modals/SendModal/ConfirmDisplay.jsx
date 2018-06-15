@@ -25,12 +25,13 @@ type State = {
 
 export default class ConfirmDisplay extends React.Component<Props, State> {
   state = {
-    agree: false
+    agree: false,
+    sendClicked: false
   }
 
   render () {
     const { onConfirm, onCancel, entries, address, message } = this.props
-    const { agree } = this.state
+    const { agree, sendClicked } = this.state
 
     return (
       <div className={styles.confirmDisplay}>
@@ -75,7 +76,13 @@ export default class ConfirmDisplay extends React.Component<Props, State> {
 
         <div className={styles.actions}>
           <Button cancel onClick={onCancel}>Cancel</Button>
-          <Button disabled={!agree} onClick={onConfirm}>Send Assets</Button>
+          <Button disabled={!agree || sendClicked} onClick={(e) => {
+            e.preventDefault()
+            this.setState({
+              sendClicked: true
+            })
+            onConfirm()
+          }}>Send Assets</Button>
         </div>
       </div>
     )
