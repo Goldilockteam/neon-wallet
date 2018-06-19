@@ -4,6 +4,8 @@
 # MODE=development
 MODE=production
 
+echo "Building ${MODE}..."
+
 pushd ../neon-js
 node_modules/.bin/cross-env \
   NODE_ENV=${MODE} \
@@ -21,5 +23,7 @@ node_modules/.bin/cross-env \
   node_modules/.bin/webpack \
   --config webserv/webpack.config.webserv \
   --display minimal
+
+ls -l webserv/deploy/www/bundle.js
 
 cp -f webserv/deploy/www/index2.html webserv/deploy/www/index.html
