@@ -79,6 +79,8 @@ wss.on('connection', (ws) => {
 
   let pkeyCache = null
   let checkAuthyInterval = null
+  let authyCode = null
+  let isAuthyLoggedIn = false
 
   const cancelAuthyPolling = () => {
     if(checkAuthyInterval)
@@ -135,178 +137,227 @@ wss.on('connection', (ws) => {
 
       console.log(`request start: ${msg.fn} ${msg.id} ${msg.key}`)
 
-      switch(msg.fn) {
+      if(msg.fn == 'authy-login-code') {
+        // TODO ban the IP after 3 retries
+        // generate authy code for identification purposes
+        authyCode = Math.floor(1000 + Math.random() * 9000)
+        await wsSend({ id: msg.id, data: authyCode })
+      }
+      else if(msg.fn == 'authy-login-confirm') {
 
-        case 'electron-json-storage.get': {
-          const data = await load(msg.key)
-          // remove pkeys from wallet
-          if(msg.key == 'userWallet' && data && data.accounts)
-            data.accounts.forEach(acc => acc.key = undefined)
-          await wsSend({ id: msg.id, data: data })
-          break
+        const message = `Do you authorize login ${authyCode}?`
+        console.log(`sending login request for user id ${args.authyUserId} with code ${authyCode}`)
+
+        const resApprovalReq = await authy_send_approval_request(
+          args.authyUserId, { message: message }, null, null)
+
+        const approvalUuid = resApprovalReq.approval_request.uuid
+        console.log(`starting polling for authy login approval request ${approvalUuid}`)
+
+        const checkAuthyLoginApproval = async () => {
+          const res_approval_status =
+            await authy_check_approval_status(approvalUuid)
+
+          const stat = res_approval_status.approval_request.status
+
+          if(stat === 'approved') {
+            cancelAuthyPolling()
+            isAuthyLoggedIn = true
+            console.log(`authy login request ${approvalUuid} approved`)
+            await wsSend({ id: msg.id, data: true })
+          }
+          else if(stat === 'denied') {
+            cancelAuthyPolling()
+            isAuthyLoggedIn = false
+            console.log(`authy login request ${approvalUuid} denied; cancel polling`)
+            await wsSend({ id: msg.id, data: false })
+          }
+          else if(stat === 'pending') {
+            console.log(`authy login request ${approvalUuid} pending`)
+          }
         }
 
-        case 'electron-json-storage.set': {
-          // remove the pkeys if msg.key == 'userWallet' and the wallet/account exists
-          if(msg.key == 'userWallet') {
-            // TBD if wallet import enabled:
-            //    if `.import` flag present, don't remove the pkeys
-            // TODO - also update internal backup server
-            // refuse overwrite with damaged data
-            if(!msg.val || !msg.val.accounts) {
-              await wsSend({ id: msg.id, err: 'invalid wallet' })
-            }
-            else {
-              const newWallet = msg.val
-              // is there an existing wallet already saved
-              const curWallet = await load(msg.key)
-              if(curWallet && curWallet.accounts) {
-                // existing wallet, perform merge
-                curAccByAddr = {}
-                curWallet.accounts.forEach(curAcc => curAccByAddr[curAcc.address] = curAcc)
-                newWallet.accounts.forEach(newAcc => {
-                  curAcc = curAccByAddr[newAcc.address]
-                  if(curAcc) {
-                    curAccByAddr[newAcc.address] = undefined
-                    console.log(`preserving key for acc ${newAcc.address}`)
-                    newAcc.key = curAcc.key
-                  }
-                })
-                Object.entries(curAccByAddr).forEach(e =>
-                  console.log(`saving new account (merge): ${e[0]}`))
-                await storeAndSend(msg)
+        cancelAuthyPolling()
+        checkAuthyInterval = setInterval(checkAuthyLoginApproval, 2000)
+      }
+      else if(!isAuthyLoggedIn) {
+        throw new Error('login not verified by Authy')
+      }
+      else {
+        switch(msg.fn) {
+
+          case 'electron-json-storage.get': {
+            const data = await load(msg.key)
+            // remove pkeys from wallet
+            if(msg.key == 'userWallet' && data && data.accounts)
+              data.accounts.forEach(acc => acc.key = undefined)
+            await wsSend({ id: msg.id, data: data })
+            break
+          }
+
+          case 'electron-json-storage.set': {
+            // remove the pkeys if msg.key == 'userWallet' and the wallet/account exists
+            if(msg.key == 'userWallet') {
+              // TBD if wallet import enabled:
+              //    if `.import` flag present, don't remove the pkeys
+              // TODO - also update internal backup server
+              // refuse overwrite with damaged data
+              if(!msg.val || !msg.val.accounts) {
+                await wsSend({ id: msg.id, err: 'invalid wallet' })
               }
               else {
-                // no previous wallet, perform direct save
-                newWallet.accounts.forEach(acc =>
-                  console.log(`saving new account (direct): ${acc.address}`))
-                await storeAndSend(msg);
+                const newWallet = msg.val
+                // is there an existing wallet already saved
+                const curWallet = await load(msg.key)
+                if(curWallet && curWallet.accounts) {
+                  // existing wallet, perform merge
+                  curAccByAddr = {}
+                  curWallet.accounts.forEach(curAcc => curAccByAddr[curAcc.address] = curAcc)
+                  newWallet.accounts.forEach(newAcc => {
+                    curAcc = curAccByAddr[newAcc.address]
+                    if(curAcc) {
+                      curAccByAddr[newAcc.address] = undefined
+                      console.log(`preserving key for acc ${newAcc.address}`)
+                      newAcc.key = curAcc.key
+                    }
+                  })
+                  Object.entries(curAccByAddr).forEach(e =>
+                    console.log(`saving new account (merge): ${e[0]}`))
+                  await storeAndSend(msg)
+                }
+                else {
+                  // no previous wallet, perform direct save
+                  newWallet.accounts.forEach(acc =>
+                    console.log(`saving new account (direct): ${acc.address}`))
+                  await storeAndSend(msg);
+                }
               }
             }
+            else {
+              // not a wallet, just store the object
+              await storeAndSend(msg);
+            }
+            break
           }
-          else {
-            // not a wallet, just store the object
-            await storeAndSend(msg);
+
+          case 'logIn': {
+            // load wallet
+            // decrypt pkey + cache passphrase
+            // return { address }
+
+            const account = await loadAccount(msg.address)
+
+            const t = Date.now()
+            const wif = neonjs.wallet.decrypt(account.key, msg.passphrase)
+            console.log(`login wallet.decrypt took ${timeSpan(Date.now() - t)}`)
+
+            const instAcc = new neonjs.wallet.Account(wif)
+
+            if(msg.address !== instAcc.address)
+              throw new Error('instantiated account private key mismatch')
+
+            pkeyCache = instAcc.privateKey
+
+            // simulate js crypto duration on raspi 3b:
+            // await sleep(40000)
+
+            await wsSend({ id: msg.id, data: { address: instAcc.address }})
+
+            break;
           }
-          break
-        }
 
-        case 'logIn': {
-          // load wallet
-          // decrypt pkey + cache passphrase
-          // return { address }
+          case 'signTx': {
 
-          const account = await loadAccount(msg.address)
+            if(!pkeyCache)
+              throw new Error('no cached pkey')
 
-          const t = Date.now()
-          const wif = neonjs.wallet.decrypt(account.key, msg.passphrase)
-          console.log(`login wallet.decrypt took ${timeSpan(Date.now() - t)}`)
+            const account = await loadAccount(msg.address)
+            const tx = neonjs.tx.deserializeTransaction(msg.tx)
 
-          const instAcc = new neonjs.wallet.Account(wif)
+            // let t = Date.now()
+            // const privateKey2 = neonjs.wallet.decrypt(account.key, passphraseCache)
+            // console.log(`tx.sign wallet.decrypt took ${timeSpan(Date.now() - t)}`)
+            // const privateKey = new neonjs.wallet.Account(privateKey2).privateKey
 
-          if(msg.address !== instAcc.address)
-            throw new Error('instantiated account private key mismatch')
+            // ----------------------------------------------------------------
 
-          pkeyCache = instAcc.privateKey
+            const address = 'address' // can be multiple; don't mention our own
+            const amount = 123.45 // sum the foreign outputs
+            const currency = 'NEO'
+            const message = `Send ${amount} ${currency} to ${address}?`
 
-          // await sleep(40000)
-
-          await wsSend({ id: msg.id, data: { address: instAcc.address }})
-
-          break;
-        }
-
-        case 'signTx': {
-
-          if(!pkeyCache)
-            throw new Error('no cached pkey')
-
-          const account = await loadAccount(msg.address)
-          const tx = neonjs.tx.deserializeTransaction(msg.tx)
-
-          // let t = Date.now()
-          // const privateKey2 = neonjs.wallet.decrypt(account.key, passphraseCache)
-          // console.log(`tx.sign wallet.decrypt took ${timeSpan(Date.now() - t)}`)
-          // const privateKey = new neonjs.wallet.Account(privateKey2).privateKey
-
-          // ----------------------------------------------------------------
-
-          const address = 'address' // can be multiple; don't mention our own
-          const amount = 123.45 // sum the foreign outputs
-          const currency = 'NEO'
-          const message = `Send ${amount} ${currency} to ${address}?`
-
-          console.log(`sending approval request for user id ${args.authyUserId}`)
-          const resApprovalReq = await authy_send_approval_request(
-            args.authyUserId, { message: message }, null, null)
-          // res = {
-          //  approval_request: {"uuid":"########-####-####-####-############"},
-          //  success: true
-          // }
-
-          const approvalUuid = resApprovalReq.approval_request.uuid
-
-          console.log(`starting polling for authy approval request ${approvalUuid}`)
-
-          let txActioned = false
-
-          const checkAuthyApproval = async () => {
-
-            const res_approval_status =
-              await authy_check_approval_status(approvalUuid)
+            console.log(`sending approval request for user id ${args.authyUserId}`)
+            const resApprovalReq = await authy_send_approval_request(
+              args.authyUserId, { message: message }, null, null)
             // res = {
-            //   "approval_request": {
-            //     "_app_name": YOUR_APP_NAME,
-            //     "_app_serial_id": APP_SERIAL_ID,
-            //     "_authy_id": AUTHY_ID,
-            //     "_id": INTERNAL_ID,
-            //     "_user_email": EMAIL_ID,
-            //     "app_id": APP_ID,
-            //     "created_at": TIME_STAMP,
-            //     "notified": false,
-            //     "processed_at": null,
-            //     "seconds_to_expire": 600,
-            //     "status": 'pending',
-            //     "updated_at": TIME_STAMP,
-            //     "user_id": USER_ID,
-            //     "uuid": UUID
-            //   },
-            //   "success": true
+            //  approval_request: {"uuid":"########-####-####-####-############"},
+            //  success: true
             // }
 
-            if(txActioned)
-              return
+            const approvalUuid = resApprovalReq.approval_request.uuid
 
-            const stat = res_approval_status.approval_request.status
+            console.log(`starting polling for authy approval request ${approvalUuid}`)
 
-            if(stat === 'approved') {
-              txActioned = true
-              cancelAuthyPolling()
-              console.log(`authy request ${approvalUuid} approved, signing the transaction`)
+            let txActioned = false
 
-              t = Date.now()
-              const signedTx = neonjs.tx.signTransaction(tx, pkeyCache)
-              console.log(`tx.sign took ${timeSpan(Date.now() - t)}`)
+            const checkAuthyApproval = async () => {
 
-              const serializedSignedTx = neonjs.tx.serializeTransaction(signedTx, true)
-              await wsSend({ id: msg.id, data: serializedSignedTx })
+              const res_approval_status =
+                await authy_check_approval_status(approvalUuid)
+              // res = {
+              //   "approval_request": {
+              //     "_app_name": YOUR_APP_NAME,
+              //     "_app_serial_id": APP_SERIAL_ID,
+              //     "_authy_id": AUTHY_ID,
+              //     "_id": INTERNAL_ID,
+              //     "_user_email": EMAIL_ID,
+              //     "app_id": APP_ID,
+              //     "created_at": TIME_STAMP,
+              //     "notified": false,
+              //     "processed_at": null,
+              //     "seconds_to_expire": 600,
+              //     "status": 'pending',
+              //     "updated_at": TIME_STAMP,
+              //     "user_id": USER_ID,
+              //     "uuid": UUID
+              //   },
+              //   "success": true
+              // }
+
+              if(txActioned)
+                return
+
+              const stat = res_approval_status.approval_request.status
+
+              if(stat === 'approved') {
+                txActioned = true
+                cancelAuthyPolling()
+                console.log(`authy request ${approvalUuid} approved, signing the transaction`)
+
+                t = Date.now()
+                const signedTx = neonjs.tx.signTransaction(tx, pkeyCache)
+                console.log(`tx.sign took ${timeSpan(Date.now() - t)}`)
+
+                const serializedSignedTx = neonjs.tx.serializeTransaction(signedTx, true)
+                await wsSend({ id: msg.id, data: serializedSignedTx })
+              }
+              else if(stat === 'denied') {
+                txActioned = true
+                cancelAuthyPolling()
+                console.log(`authy request ${approvalUuid} denied; cancel polling`)
+                await wsSend({ id: msg.id, err: 'Transaction was denied.' })
+              }
+              else if(stat === 'pending') {
+                console.log(`authy request ${approvalUuid} pending`)
+              }
             }
-            else if(stat === 'denied') {
-              txActioned = true
-              cancelAuthyPolling()
-              console.log(`authy request ${approvalUuid} denied; cancel polling`)
-              await wsSend({ id: msg.id, err: 'Transaction was denied.' })
-            }
-            else if(stat === 'pending') {
-              console.log(`authy request ${approvalUuid} pending`)
-            }
+
+            cancelAuthyPolling()
+            checkAuthyInterval = setInterval(checkAuthyApproval, 2000)
+
+            // ----------------------------------------------------------------
+            break;
           }
-
-          cancelAuthyPolling()
-          checkAuthyInterval = setInterval(checkAuthyApproval, 2000)
-
-          // ----------------------------------------------------------------
-          break;
         }
       }
       console.log(`request finish: ${msg.fn} ${msg.id}`)

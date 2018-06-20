@@ -1,0 +1,23 @@
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#gd-authy {
+  font-size: 14pt;
+  border: 1px solid gray;
+  padding: 50px;
+  text-align: center;
+}
+
+#gd-authy-code {
+  color: red;
+}
