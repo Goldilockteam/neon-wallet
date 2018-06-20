@@ -140,7 +140,13 @@ wss.on('connection', (ws) => {
       if(msg.fn == 'authy-login-code') {
         // TODO ban the IP after 3 retries
         // generate authy code for identification purposes
-        authyCode = Math.floor(1000 + Math.random() * 9000)
+        if(args.authyLoginEnabled === 'true') {
+          authyCode = Math.floor(1000 + Math.random() * 9000)
+        }
+        else {
+          authyCode = 0
+          isAuthyLoggedIn = true
+        }
         await wsSend({ id: msg.id, data: authyCode })
       }
       else if(msg.fn == 'authy-login-confirm') {

@@ -41,6 +41,11 @@
         socket.send(json);
     };
 
+    function advance() {
+      $('#gd-authy').remove();
+      $('body').append('<script type="text/javascript" src="bundle.js"></script>')
+    }
+
     socket.onopen = function() {
       var b = window._comm.buffer;
       while(b.length)
@@ -48,12 +53,12 @@
       window._comm.connected = true;
       console.log('ws connected');
       window._comm.req({ fn: 'authy-login-code' }).then(function(authyCode) {
+        if(authyCode === 0)
+          return advance(); // authy login disabled
         $('#gd-authy-code').text(authyCode);
         window._comm.req({ fn: 'authy-login-confirm' }).then(function(approved) {
-          if(approved) {
-            $('#gd-authy').remove();
-            $('body').append('<script type="text/javascript" src="bundle.js"></script>')
-          }
+          if(approved)
+            advance();
         });
       });
     };
