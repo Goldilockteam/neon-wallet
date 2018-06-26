@@ -78,13 +78,18 @@ const makeRequest = (sendEntries: Array<SendEntryType>, config: Object) => {
   )
 
   if (script === '') {
-    return api.sendAsset({ ...config, intents: buildIntents(sendEntries) }, api.neoscan)
+    return api.sendAsset({
+      ...config,
+      intents: buildIntents(sendEntries),
+      approvalMessage: sendEntries.approvalMessage
+    }, api.neoscan)
   } else {
     return api.doInvoke({
       ...config,
       intents: buildIntents(sendEntries),
       script,
-      gas: 0
+      gas: 0,
+      approvalMessage: sendEntries.approvalMessage
     }, api.neoscan)
   }
 }
@@ -126,12 +131,14 @@ export const sendTransaction = (sendEntries: Array<SendEntryType>) => async (
     )
   }
   else {
-    dispatch(
-      showInfoNotification({
-        message: 'Please authorize the transaction on your smartphone',
-        autoDismiss: 0
-      })
-    )
+    sendEntries.approvalMessage = (tx) => {
+      dispatch(
+        showInfoNotification({
+          message: `Please authorize the transaction ${tx.hash} on your smartphone`,
+          autoDismiss: 0
+        })
+      )
+    }
   }
 
   try {

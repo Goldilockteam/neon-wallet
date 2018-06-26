@@ -17,6 +17,15 @@ const authy_register_user = promisify(authy.register_user.bind(authy))
 const authy_send_approval_request = promisify(authy.send_approval_request.bind(authy))
 const authy_check_approval_status = promisify(authy.check_approval_status.bind(authy))
 
+const getTxType = (tx) => {
+  switch(tx.type) {
+    case 2: return 'Claim'
+    case 128: return 'Contract'
+    case 209: return 'Invocation'
+    default: return 'Unknown'
+  }
+}
+
 const sleep = async (millis) => {
   console.log(`sleeping for ${millis} millis`)
   return new Promise((resolve, reject) => {
@@ -278,7 +287,9 @@ wss.on('connection', (ws) => {
               throw new Error('no cached pkey')
 
             const account = await loadAccount(msg.address)
-            const tx = neonjs.tx.deserializeTransaction(msg.tx)
+            const tx = new neonjs.tx.Transaction(neonjs.tx.deserializeTransaction(msg.tx))
+
+            console.dir(tx)
 
             // let t = Date.now()
             // const privateKey2 = neonjs.wallet.decrypt(account.key, passphraseCache)
@@ -287,10 +298,15 @@ wss.on('connection', (ws) => {
 
             // ----------------------------------------------------------------
 
-            const address = 'address' // can be multiple; don't mention our own
-            const amount = 123.45 // sum the foreign outputs
-            const currency = 'NEO'
-            const message = `Send ${amount} ${currency} to ${address}?`
+            // const address = 'address' // can be multiple; don't mention our own
+            // const amount = 123.45 // sum the foreign outputs
+            // const currency = 'NEO'
+            // const message = `Send ${amount} ${currency} to ${address}?`
+
+            // const type = getTxType(tx)
+            // const message = `Approve ${type} transaction ${tx.hash}?`
+
+            const message = `Approve transaction ${tx.hash}?`
 
             console.log(`sending approval request for user id ${args.authyUserId}`)
             const resApprovalReq = await authy_send_approval_request(

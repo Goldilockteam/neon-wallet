@@ -1,8 +1,8 @@
 #!/bin/bash
 # has to be run from project root
 
-MODE=development
-# MODE=production
+# MODE=development
+MODE=production
 
 echo "Building ${MODE}..."
 

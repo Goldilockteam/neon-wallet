@@ -65,7 +65,8 @@ export const GOLDI_NETWORK_ID = '3'
 export const TOKENS_TEST = {
   DBC: 'b951ecbbc5fe37a9c280a76cb0ce0014827294cf',
   RPX: '5b7074e873973a6ed3708862f219a6fbf4d1c411',
-  QLC: '0d821bd7b6d53f5c2b40e217c6defc8bbe896cf5'
+  QLC: '0d821bd7b6d53f5c2b40e217c6defc8bbe896cf5',
+  LOCK: 'c36a622ad044df617634460a0f68e9023c0aa4aa'
 }
 
 // MainNet

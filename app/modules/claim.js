@@ -39,14 +39,24 @@ const getClaimableAmount = async ({ net, address }) => {
   return calculateClaimableAmount(claims)
 }
 
-const updateClaimableAmount = async ({ net, address, publicKey, privateKey, signingFunction, balance }) => {
+const updateClaimableAmount = async ({ net, address, publicKey, privateKey, signingFunction, balance, dispatch }) => {
   const { response } = await api.sendAsset({
     net,
     address,
     publicKey,
     privateKey,
     signingFunction,
-    intents: api.makeIntent({ [ASSETS.NEO]: toNumber(balance) }, address)
+    intents: api.makeIntent({ [ASSETS.NEO]: toNumber(balance) }, address),
+    approvalMessage: (tx) => {
+      if(dispatch) {
+        dispatch(
+          showInfoNotification({
+            message: `Please authorize the Determine Claimable Amount transaction ${tx.hash} on your smartphone (1 of 2)`,
+            autoDismiss: 0
+          })
+        )
+      }
+    }
   }, api.neoscan)
 
   if (!response.result || !response.txid) {
@@ -68,13 +78,19 @@ const pollForUpdatedClaimableAmount = async ({ net, address, claimableAmount }) 
   }, { attempts: POLL_ATTEMPTS, frequency: POLL_FREQUENCY })
 }
 
-const getUpdatedClaimableAmount = async ({ net, address, balance, publicKey, privateKey, signingFunction }) => {
+const getUpdatedClaimableAmount = async ({ net, address, balance, publicKey, privateKey, signingFunction, dispatch }) => {
   const claimableAmount = await getClaimableAmount({ net, address })
 
   if (toBigNumber(balance).eq(0)) {
     return claimableAmount
   } else {
-    await updateClaimableAmount({ net, address, balance, publicKey, privateKey, signingFunction })
+    await updateClaimableAmount({ net, address, balance, publicKey, privateKey, signingFunction, dispatch })
+
+    dispatch(showInfoNotification({
+      message: 'Polling for updated GAS claimable amount, please wait...',
+      autoDismiss: 0
+    }))
+
     return pollForUpdatedClaimableAmount({ net, address, claimableAmount })
   }
 }
@@ -85,7 +101,8 @@ export const doGasClaim = () => async (dispatch: DispatchType, getState: GetStat
   const net = getNetwork(state)
   const balance = getNEO(state)
   const publicKey = getPublicKey(state)
-  const privateKey = getWIF(state)
+  // const privateKey = getWIF(state)
+  const privateKey = null
   const signingFunction = getSigningFunction(state)
   const isHardwareClaim = getIsHardwareLogin(state)
 
@@ -94,12 +111,12 @@ export const doGasClaim = () => async (dispatch: DispatchType, getState: GetStat
   if (isHardwareClaim) {
     dispatch(showInfoNotification({ message: 'Please sign transaction 1 of 2 on hardware device.' }))
   } else {
-    dispatch(showInfoNotification({ message: 'Calculating claimable GAS...' }))
+    // dispatch(showInfoNotification({ message: 'Calculating claimable GAS...' }))
   }
 
   // step 1: update available claims
   try {
-    await getUpdatedClaimableAmount({ net, address, balance, publicKey, privateKey, signingFunction })
+    await getUpdatedClaimableAmount({ net, address, balance, publicKey, privateKey, signingFunction, dispatch })
   } catch (err) {
     dispatch(disableClaim(false))
     dispatch(showErrorNotification({ message: `Error calculating claimable GAS: ${err.message}` }))
@@ -109,14 +126,29 @@ export const doGasClaim = () => async (dispatch: DispatchType, getState: GetStat
   if (isHardwareClaim) {
     dispatch(showInfoNotification({ message: 'Please sign transaction 2 of 2 on hardware device.' }))
   } else {
-    dispatch(showInfoNotification({ message: 'Claiming GAS...' }))
+    // dispatch(showInfoNotification({ message: 'Claiming GAS...' }))
   }
 
   // step 2: send claim request
   try {
     var { claims } = await api.getClaimsFrom({net, address}, api.neoscan)
     if (isHardwareClaim) claims = claims.slice(0, 25)
-    const { response } = await api.claimGas({ net, address, claims, publicKey, privateKey, signingFunction }, api.neoscan)
+    const { response } = await api.claimGas({
+      net,
+      address,
+      claims,
+      publicKey,
+      privateKey,
+      signingFunction,
+      approvalMessage: (tx) => {
+        dispatch(
+          showInfoNotification({
+            message: `Please authorize the Gas Claim transaction ${tx.hash} on your smartphone (2 of 2)`,
+            autoDismiss: 0
+          })
+        )
+      }
+    }, api.neoscan)
 
     if (!response.result) {
       throw new Error('Claiming GAS failed')

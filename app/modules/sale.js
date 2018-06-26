@@ -29,7 +29,7 @@ export const participateInSale = (
   gasCost: string = '0'
 ) => async (dispatch: DispatchType, getState: GetStateType) => {
   const state = getState()
-  const wif = getWIF(state)
+  // const wif = getWIF(state)
   const publicKey = getPublicKey(state)
   const NEO = toNumber(getNEO(state))
   const GAS = toNumber(getGAS(state))
@@ -38,7 +38,7 @@ export const participateInSale = (
   const isHardwareLogin = getIsHardwareLogin(state)
   const signingFunction = getSigningFunction(state)
 
-  const account = new wallet.Account(wif)
+  // const account = new wallet.Account(wif)
   const neoToMint = toNumber(neoToSend)
   const gasToMint = toNumber(gasToSend)
 
@@ -70,9 +70,9 @@ export const participateInSale = (
       })
     )
   } else {
-    notificationId = dispatch(
-      showInfoNotification({ message: 'Sending transaction', autoDismiss: 0 })
-    )
+    // notificationId = dispatch(
+    //   showInfoNotification({ message: 'Sending transaction', autoDismiss: 0 })
+    // )
   }
 
   const scriptHashAddress = wallet.getAddressFromScriptHash(_scriptHash)
@@ -91,12 +91,20 @@ export const participateInSale = (
   const config = {
     net,
     address,
-    privateKey: isHardwareLogin ? null : account.privateKey,
+    // privateKey: isHardwareLogin ? null : account.privateKey,
     intents: flatten(intents),
     script,
     gas: 0,
     publicKey: isHardwareLogin ? publicKey : null,
-    signingFunction: isHardwareLogin ? signingFunction : null
+    signingFunction: isHardwareLogin ? signingFunction : null,
+    approvalMessage: (tx) => {
+      dispatch(
+        showInfoNotification({
+          message: `Please authorize the Token Purchase transaction ${tx.hash} on your smartphone`,
+          autoDismiss: 0
+        })
+      )
+    }
   }
 
   const [error, response] = await asyncWrap(api.doInvoke(config, api.neoscan))
