@@ -18,28 +18,31 @@ RESTART="/etc/init.d/neon-wallet restart"
 mkdir -p tmp
 tar -cj \
   --exclude .DS_Store \
+  --exclude node_modules/@mlink/scrypt/build/Release \
   -f $TDIR/$ARCHIVE \
   -C $ORIGIN \
   authy.js electron-json-storage.js  node_modules  server.js  www
 
-ls -l $TDIR/$ARCHIVE
+tar tjf $TDIR/$ARCHIVE | grep Release
 
-for TARGET in "${TARGETS[@]}"
-do
-  TARGET="root@${TARGET}"
-  echo "deploying to ${TARGET}"
+# ls -l $TDIR/$ARCHIVE
 
-  echo "NOTE: make sure you have done initial 'npm install' in the ./deploy directory!"
+# for TARGET in "${TARGETS[@]}"
+# do
+#   TARGET="root@${TARGET}"
+#   echo "deploying to ${TARGET}"
 
-  # TODO disable
-  # gotta kill node as there's no pid file created by the previous (faulty) script
-  echo "NOTE: temporary: copying neon-wallet.init to the device and killing node.js for auto-restart"
-  scp $SSHOPTS ../../walletpc-raspi3b/meta-walletpc/recipes-wallet/neon-wallet/files/neon-wallet.init "$TARGET:/etc/init.d/neon-wallet"
-  ssh $SSHOPTS "$TARGET" 'kill -9 $(pidof node)'
+#   echo "NOTE: make sure you have done initial 'npm install' in the ./deploy directory!"
 
-  scp $SSHOPTS $TDIR/$ARCHIVE "$TARGET:$RHOME" && \
-  ssh $SSHOPTS "$TARGET" "$EXPAND" && \
-  ssh $SSHOPTS "$TARGET" "$RESTART"
-done
+#   # TODO disable
+#   # gotta kill node as there's no pid file created by the previous (faulty) script
+#   echo "NOTE: temporary: copying neon-wallet.init to the device and killing node.js for auto-restart"
+#   scp $SSHOPTS ../../walletpc-raspi3b/meta-walletpc/recipes-wallet/neon-wallet/files/neon-wallet.init "$TARGET:/etc/init.d/neon-wallet"
+#   ssh $SSHOPTS "$TARGET" 'kill -9 $(pidof node)'
+
+#   scp $SSHOPTS $TDIR/$ARCHIVE "$TARGET:$RHOME" && \
+#   ssh $SSHOPTS "$TARGET" "$EXPAND" && \
+#   ssh $SSHOPTS "$TARGET" "$RESTART"
+# done
 
 rm -f $ARCHIVE
