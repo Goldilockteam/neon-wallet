@@ -35,7 +35,7 @@ do
   # gotta kill node as there's no pid file created by the previous (faulty) script
   echo "NOTE: temporary: copying neon-wallet.init to the device and killing node.js for auto-restart"
   scp $SSHOPTS ../../walletpc-raspi3b/meta-walletpc/recipes-wallet/neon-wallet/files/neon-wallet.init "$TARGET:/etc/init.d/neon-wallet"
-  ssh $SSHOPTS "$TARGET" "kill -9 $(pidof node)"
+  ssh $SSHOPTS "$TARGET" 'kill -9 $(pidof node)'
 
   scp $SSHOPTS $TDIR/$ARCHIVE "$TARGET:$RHOME" && \
   ssh $SSHOPTS "$TARGET" "$EXPAND" && \

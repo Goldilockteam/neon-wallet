@@ -17,6 +17,10 @@ const authy_register_user = promisify(authy.register_user.bind(authy))
 const authy_send_approval_request = promisify(authy.send_approval_request.bind(authy))
 const authy_check_approval_status = promisify(authy.check_approval_status.bind(authy))
 
+
+require('assert')(module == process.mainModule)
+exports.nativeScrypt = require('@mlink/scrypt')
+
 const getTxType = (tx) => {
   switch(tx.type) {
     case 2: return 'Claim'
@@ -262,9 +266,13 @@ wss.on('connection', (ws) => {
 
             const account = await loadAccount(msg.address)
 
+            // const t = Date.now()
+            // const wif = neonjs.wallet.decrypt(account.key, msg.passphrase)
+            // console.log(`login wallet.decrypt took ${timeSpan(Date.now() - t)}`)
+
             const t = Date.now()
-            const wif = neonjs.wallet.decrypt(account.key, msg.passphrase)
-            console.log(`login wallet.decrypt took ${timeSpan(Date.now() - t)}`)
+            const wif = await neonjs.wallet.decryptAsync(account.key, msg.passphrase)
+            console.log(`login wallet.decryptAsync took ${timeSpan(Date.now() - t)}`)
 
             const instAcc = new neonjs.wallet.Account(wif)
 
