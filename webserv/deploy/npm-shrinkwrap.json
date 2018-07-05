@@ -24,7 +24,7 @@
       }
     },
     "@mlink/scrypt": {
-      "version": "github:youurayy/node-scrypt#54d19c541d6d84d3850b26be139d6ba171f7ea1a",
+      "version": "github:youurayy/node-scrypt#1cfc8399c389b3049d67a34344e8ad94180a7e5c",
       "from": "github:youurayy/node-scrypt",
       "requires": {
         "bindings": "^1.3.0",

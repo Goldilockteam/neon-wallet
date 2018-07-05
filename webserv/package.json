@@ -8,6 +8,7 @@
   "dependencies": {
     "@cityofzion/neon-js": "git://github.com/goldilockteam/neon-js.git#goldilock_dev",
     "@ledgerhq/hw-transport-u2f": "^4.12.0",
+    "@mlink/scrypt": "github:youurayy/node-scrypt",
     "select": "^1.1.2"
   }
 }
