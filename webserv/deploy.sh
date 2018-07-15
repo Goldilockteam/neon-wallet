@@ -4,13 +4,13 @@ export COPY_EXTENDED_ATTRIBUTES_DISABLE=true
 export COPYFILE_DISABLE=true
 
 TARGETS=(
-  "user1.goldilock.com"
+  "user1.goldilock.com:22"
 #  "user2.goldilock.com"
 )
 
 ORIGIN="deploy"
 ARCHIVE="deploy.tbz"
-SSHOPTS="-o StrictHostKeyChecking=false -o UserKnownHostsFile=/dev/null"
+TDIR="."
 RHOME="/usr/share/neon-wallet"
 EXPAND="tar xjf $RHOME/$ARCHIVE -C $RHOME"
 RESTART="/etc/init.d/neon-wallet restart"
@@ -25,24 +25,29 @@ tar -cj \
 
 tar tjf $TDIR/$ARCHIVE | grep Release
 
-# ls -l $TDIR/$ARCHIVE
+ls -l $TDIR/$ARCHIVE
 
-# for TARGET in "${TARGETS[@]}"
-# do
-#   TARGET="root@${TARGET}"
-#   echo "deploying to ${TARGET}"
+for TARGET in "${TARGETS[@]}"
 
-#   echo "NOTE: make sure you have done initial 'npm install' in the ./deploy directory!"
+do
+  TARGET=(${TARGET//:/ })
+  HOST="root@${TARGET[0]}"
+  SSHPORT="${TARGET[1]}"
+  SSHOPTS="-p $SSHPORT -o StrictHostKeyChecking=false -o UserKnownHostsFile=/dev/null"
+  SCPOPTS="-P $SSHPORT -o StrictHostKeyChecking=false -o UserKnownHostsFile=/dev/null"
 
-#   # TODO disable
-#   # gotta kill node as there's no pid file created by the previous (faulty) script
-#   echo "NOTE: temporary: copying neon-wallet.init to the device and killing node.js for auto-restart"
-#   scp $SSHOPTS ../../walletpc-raspi3b/meta-walletpc/recipes-wallet/neon-wallet/files/neon-wallet.init "$TARGET:/etc/init.d/neon-wallet"
-#   ssh $SSHOPTS "$TARGET" 'kill -9 $(pidof node)'
+  echo "deploying to ${HOST} : ${SSHPORT}"
+  echo "NOTE: make sure you have done initial 'npm install' in the ./deploy directory!"
 
-#   scp $SSHOPTS $TDIR/$ARCHIVE "$TARGET:$RHOME" && \
-#   ssh $SSHOPTS "$TARGET" "$EXPAND" && \
-#   ssh $SSHOPTS "$TARGET" "$RESTART"
-# done
+  # TODO disable
+  # gotta kill node as there's no pid file created by the previous (faulty) script
+  # echo "NOTE: temporary: copying neon-wallet.init to the device and killing node.js for auto-restart"
+  # scp $SCPOPTS ../../walletpc-raspi3b/meta-walletpc/recipes-wallet/neon-wallet/files/neon-wallet.init "$TARGET:/etc/init.d/neon-wallet"
+  # ssh $SSHOPTS "$HOST" "kill -9 $(pidof node)"
 
-rm -f $ARCHIVE
+  scp $SCPOPTS $TDIR/$ARCHIVE "$HOST:$RHOME" && \
+  ssh $SSHOPTS "$HOST" "$EXPAND" && \
+  ssh $SSHOPTS "$HOST" "$RESTART"
+done
+
+rm -f $TDIR/$ARCHIVE
