@@ -271,7 +271,7 @@ wss.on('connection', (ws) => {
             // console.log(`login wallet.decrypt took ${timeSpan(Date.now() - t)}`)
 
             const t = Date.now()
-            const wif = await neonjs.wallet.decryptAsync(account.key, msg.passphrase)
+            const wif = await neonjs.wallet.decryptAsyncNative(account.key, msg.passphrase)
             console.log(`login wallet.decryptAsync took ${timeSpan(Date.now() - t)}`)
 
             const instAcc = new neonjs.wallet.Account(wif)
