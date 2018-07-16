@@ -7,6 +7,11 @@ export const ASSETS = {
   GAS: 'GAS'
 }
 
+export const SEND_MODAL_SIZES = {
+  ADD_RECIPIENT: '350px',
+  EXPANDED_PRIORITY_FEE: '485px'
+}
+
 export const EXPLORERS = {
   NEO_TRACKER: 'Neotracker',
   NEO_SCAN: 'Neoscan',
@@ -59,7 +64,8 @@ export const MODAL_TYPES = {
 
 export const MAIN_NETWORK_ID = '1'
 export const TEST_NETWORK_ID = '2'
-export const GOLDI_NETWORK_ID = '3'
+export const COZ_TEST_NETWORK_ID = '3'
+export const GOLDI_NETWORK_ID = '4'
 
 // TestNet
 export const TOKENS_TEST = {
@@ -88,7 +94,9 @@ export const TOKENS = {
   GDM: 'd1e37547d88bc9607ff9d73116ebd9381c156f79',
   PKC: 'af7c7328eee5a275a3bcaee2bf0cf662b5e739be',
   SOUL: 'ed07cffad18f1308db51920d99a2af60ac66a7b3',
-  ASA: 'a58b56b30425d3d1f8902034996fcac4168ef71d'
+  ASA: 'a58b56b30425d3d1f8902034996fcac4168ef71d',
+  SPOT: '0a91cdc3c5ff89983c79e3c72e1ccd9e5beaa5d5',
+  PEGUSD: 'ce150fa3ded336886871664e827f16fb70c45ceb'
 }
 
 // GoldiNet
@@ -96,8 +104,23 @@ export const TOKENS_GOLDI = {
 }
 
 export const ENDED_ICO_TOKENS = [
-  'DBC', 'RPX', 'RHT', 'QLC', 'NRVE', 'IAM', 'ONT', 'THOR', 'CGE', 'AVA', 'SWH', 'SWTH', 'EFX', 'MCT', 'PKC'
-  // 'SOUL', 'ASA'
+  'DBC',
+  'RPX',
+  'RHT',
+  'QLC',
+  'NRVE',
+  'IAM',
+  'ONT',
+  'THOR',
+  'CGE',
+  'AVA',
+  'SWH',
+  'SWTH',
+  'EFX',
+  'MCT',
+  'PKC',
+  'PEGUSD'
+  // 'SOUL', 'ASA', 'SPOT'
 ]
 
 export const DEPRECATED_TOKENS = [

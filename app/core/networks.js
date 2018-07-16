@@ -1,11 +1,11 @@
 // @flow
-import { MAIN_NETWORK_ID, TEST_NETWORK_ID, GOLDI_NETWORK_ID } from './constants'
+import { MAIN_NETWORK_ID, TEST_NETWORK_ID, COZ_TEST_NETWORK_ID, GOLDI_NETWORK_ID } from './constants'
 
 export const isMainNetwork = (networkId: string) => networkId === MAIN_NETWORK_ID
 export const isTestNetwork = (networkId: string) => networkId === TEST_NETWORK_ID
 export const isGoldiNetwork = (networkId: string) => networkId === GOLDI_NETWORK_ID
 
-export const getNetworks = () => ([
+export const getNetworks = (): Array<NetworkItemType> => ([
   {
     id: MAIN_NETWORK_ID,
     label: 'MainNet',
@@ -15,6 +15,11 @@ export const getNetworks = () => ([
     id: TEST_NETWORK_ID,
     label: 'TestNet',
     network: 'TestNet'
+  },
+  {
+    id: COZ_TEST_NETWORK_ID,
+    label: 'CoZ TestNet',
+    network: 'CozNet'
   },
   {
     id: GOLDI_NETWORK_ID,

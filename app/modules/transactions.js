@@ -76,7 +76,6 @@ const makeRequest = (sendEntries: Array<SendEntryType>, config: Object) => {
     config.address,
     config.tokensBalanceMap
   )
-
   if (script === '') {
     return api.sendAsset({
       ...config,
@@ -94,7 +93,7 @@ const makeRequest = (sendEntries: Array<SendEntryType>, config: Object) => {
   }
 }
 
-export const sendTransaction = (sendEntries: Array<SendEntryType>) => async (
+export const sendTransaction = (sendEntries: Array<SendEntryType>, priorityFee: string) => async (
   dispatch: DispatchType,
   getState: GetStateType
 ): Promise<*> => {
@@ -147,6 +146,7 @@ export const sendTransaction = (sendEntries: Array<SendEntryType>) => async (
       tokensBalanceMap,
       address: fromAddress,
       publicKey,
+      fees: toNumber(priorityFee),
       // privateKey: new wallet.Account(wif).privateKey,
       signingFunction: isHardwareSend ? signingFunction : null
     })
