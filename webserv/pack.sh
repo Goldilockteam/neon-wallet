@@ -4,7 +4,7 @@
 # MODE=development
 MODE=production
 
-echo "Building ${MODE}..."
+echo "Building neon-js for ${MODE}..."
 
 pushd ../neon-js
 node_modules/.bin/cross-env \
@@ -14,9 +14,17 @@ node_modules/.bin/cross-env \
   --display minimal
 popd
 
+echo "Update neon-wallet neon-js..."
 NEONJS=webserv/node_modules/\@cityofzion/neon-js/lib/
-cp -f ../neon-js/lib/{browser.js,index.js} ${NEONJS}
+cp -f ../neon-js/lib/* ${NEONJS}
 ls -l ${NEONJS}
+
+echo "Update server neon-js..."
+NEONJS=webserv/deploy/node_modules/\@cityofzion/neon-js/lib/
+cp -f ../neon-js/lib/* ${NEONJS}
+ls -l ${NEONJS}
+
+echo "Building neon-wallet for ${MODE}..."
 
 node_modules/.bin/cross-env \
   NODE_ENV=${MODE} \
@@ -27,3 +35,5 @@ node_modules/.bin/cross-env \
 ls -l webserv/deploy/www/bundle.js
 
 cp -f webserv/deploy/www/index2.html webserv/deploy/www/index.html
+
+echo "Done."
