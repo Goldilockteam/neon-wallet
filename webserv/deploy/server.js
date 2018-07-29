@@ -16,7 +16,7 @@ const {timeSpan} = require('utilz')
 const authy_register_user = promisify(authy.register_user.bind(authy))
 const authy_send_approval_request = promisify(authy.send_approval_request.bind(authy))
 const authy_check_approval_status = promisify(authy.check_approval_status.bind(authy))
-
+const MAX_AUTHY_POLL_ERRORS = 5
 
 require('assert')(module == process.mainModule)
 exports.nativeScrypt = require('@mlink/scrypt')
@@ -94,11 +94,20 @@ wss.on('connection', (ws) => {
   let checkAuthyInterval = null
   let authyCode = null
   let isAuthyLoggedIn = false
+  let authyPollingErrors = 0
 
   const cancelAuthyPolling = () => {
     if(checkAuthyInterval)
       clearInterval(checkAuthyInterval)
     checkAuthyInterval = null
+    authyPollingErrors = 0
+  }
+
+  const cancelIfTooManyAuthyPollingErrors = () => {
+    // sometimes `authy_check_approval_status()` fails / returns `undefined`,
+    // so let's handle that when its repeated
+    if(authyPollingErrors++ > MAX_AUTHY_POLL_ERRORS)
+      cancelAuthyPolling()
   }
 
   ws.on('error', (e) => {
@@ -118,6 +127,7 @@ wss.on('connection', (ws) => {
       })
     })
   }
+
   const storeAndSend = (msg) => {
     return new Promise((resolve, reject) => {
       electronJsonStorage.set(msg.key, msg.val, ejsOpts, err =>
@@ -174,25 +184,31 @@ wss.on('connection', (ws) => {
         console.log(`starting polling for authy login approval request ${approvalUuid}`)
 
         const checkAuthyLoginApproval = async () => {
-          const res_approval_status =
-            await authy_check_approval_status(approvalUuid)
+          try {
+            const res_approval_status =
+              await authy_check_approval_status(approvalUuid)
 
-          const stat = res_approval_status.approval_request.status
+            const stat = res_approval_status.approval_request.status
 
-          if(stat === 'approved') {
-            cancelAuthyPolling()
-            isAuthyLoggedIn = true
-            console.log(`authy login request ${approvalUuid} approved`)
-            await wsSend({ id: msg.id, data: true })
+            if(stat === 'approved') {
+              cancelAuthyPolling()
+              isAuthyLoggedIn = true
+              console.log(`authy login request ${approvalUuid} approved`)
+              await wsSend({ id: msg.id, data: true })
+            }
+            else if(stat === 'denied') {
+              cancelAuthyPolling()
+              isAuthyLoggedIn = false
+              console.log(`authy login request ${approvalUuid} denied; cancel polling`)
+              await wsSend({ id: msg.id, data: false })
+            }
+            else if(stat === 'pending') {
+              console.log(`authy login request ${approvalUuid} pending`)
+            }
           }
-          else if(stat === 'denied') {
-            cancelAuthyPolling()
-            isAuthyLoggedIn = false
-            console.log(`authy login request ${approvalUuid} denied; cancel polling`)
-            await wsSend({ id: msg.id, data: false })
-          }
-          else if(stat === 'pending') {
-            console.log(`authy login request ${approvalUuid} pending`)
+          catch(e) {
+            console.log(`error in checkAuthyLoginApproval: ${e}`)
+            cancelIfTooManyAuthyPollingErrors()
           }
         }
 
@@ -332,53 +348,60 @@ wss.on('connection', (ws) => {
 
             const checkAuthyApproval = async () => {
 
-              const res_approval_status =
-                await authy_check_approval_status(approvalUuid)
-              // res = {
-              //   "approval_request": {
-              //     "_app_name": YOUR_APP_NAME,
-              //     "_app_serial_id": APP_SERIAL_ID,
-              //     "_authy_id": AUTHY_ID,
-              //     "_id": INTERNAL_ID,
-              //     "_user_email": EMAIL_ID,
-              //     "app_id": APP_ID,
-              //     "created_at": TIME_STAMP,
-              //     "notified": false,
-              //     "processed_at": null,
-              //     "seconds_to_expire": 600,
-              //     "status": 'pending',
-              //     "updated_at": TIME_STAMP,
-              //     "user_id": USER_ID,
-              //     "uuid": UUID
-              //   },
-              //   "success": true
-              // }
+              try {
 
-              if(txActioned)
-                return
+                const res_approval_status =
+                  await authy_check_approval_status(approvalUuid)
+                // res = {
+                //   "approval_request": {
+                //     "_app_name": YOUR_APP_NAME,
+                //     "_app_serial_id": APP_SERIAL_ID,
+                //     "_authy_id": AUTHY_ID,
+                //     "_id": INTERNAL_ID,
+                //     "_user_email": EMAIL_ID,
+                //     "app_id": APP_ID,
+                //     "created_at": TIME_STAMP,
+                //     "notified": false,
+                //     "processed_at": null,
+                //     "seconds_to_expire": 600,
+                //     "status": 'pending',
+                //     "updated_at": TIME_STAMP,
+                //     "user_id": USER_ID,
+                //     "uuid": UUID
+                //   },
+                //   "success": true
+                // }
 
-              const stat = res_approval_status.approval_request.status
+                if(txActioned)
+                  return
 
-              if(stat === 'approved') {
-                txActioned = true
-                cancelAuthyPolling()
-                console.log(`authy request ${approvalUuid} approved, signing the transaction`)
+                const stat = res_approval_status.approval_request.status
 
-                t = Date.now()
-                const signedTx = neonjs.tx.signTransaction(tx, pkeyCache)
-                console.log(`tx.sign took ${timeSpan(Date.now() - t)}`)
+                if(stat === 'approved') {
+                  txActioned = true
+                  cancelAuthyPolling()
+                  console.log(`authy request ${approvalUuid} approved, signing the transaction`)
 
-                const serializedSignedTx = neonjs.tx.serializeTransaction(signedTx, true)
-                await wsSend({ id: msg.id, data: serializedSignedTx })
+                  t = Date.now()
+                  const signedTx = neonjs.tx.signTransaction(tx, pkeyCache)
+                  console.log(`tx.sign took ${timeSpan(Date.now() - t)}`)
+
+                  const serializedSignedTx = neonjs.tx.serializeTransaction(signedTx, true)
+                  await wsSend({ id: msg.id, data: serializedSignedTx })
+                }
+                else if(stat === 'denied') {
+                  txActioned = true
+                  cancelAuthyPolling()
+                  console.log(`authy request ${approvalUuid} denied; cancel polling`)
+                  await wsSend({ id: msg.id, err: 'Transaction was denied.' })
+                }
+                else if(stat === 'pending') {
+                  console.log(`authy request ${approvalUuid} pending`)
+                }
               }
-              else if(stat === 'denied') {
-                txActioned = true
-                cancelAuthyPolling()
-                console.log(`authy request ${approvalUuid} denied; cancel polling`)
-                await wsSend({ id: msg.id, err: 'Transaction was denied.' })
-              }
-              else if(stat === 'pending') {
-                console.log(`authy request ${approvalUuid} pending`)
+              catch(e) {
+                console.log(`error in checkAuthyApproval: ${e}`)
+                cancelIfTooManyAuthyPollingErrors()
               }
             }
 
@@ -400,6 +423,11 @@ wss.on('connection', (ws) => {
 })
 
 app.use(express.static(args.webdir || 'www'))
+
+app.use((req, res) => {
+  // res.send(404, 'Page not found')
+  res.redirect('/')
+})
 
 server.listen(3000, () => {
   console.log('listening on port 3000')
