@@ -1,7 +1,12 @@
 // @flow
 import { openExternal } from './electron'
 import explorerConfig from './explorerConfig'
+<<<<<<< HEAD
 import { isMainNetwork, isGoldiNetwork } from './networks'
+=======
+import { MAIN_NETWORK_ID, TEST_NETWORK_ID, COZ_TEST_NETWORK_ID, GOLDI_NETWORK_ID, EXPLORERS } from './constants'
+const { NEO_SCAN } = EXPLORERS
+>>>>>>> dev
 
 export const buildExplorerLink = (
   networkId: string,
@@ -11,7 +16,8 @@ export const buildExplorerLink = (
 ) => {
   if (explorerConfig.hasOwnProperty(explorer)) {
     const explorerInfo = explorerConfig[explorer]
-
+    // hack because only neoscan supports coznet
+    if (networkId === COZ_TEST_NETWORK_ID) return getExplorerBaseURL(networkId, explorer) + 'transaction/' + suffix
     return getExplorerBaseURL(networkId, explorer) + explorerInfo[structure] + suffix
   }
 
@@ -21,21 +27,25 @@ export const buildExplorerLink = (
 export const getExplorerBaseURL = (networkId: string, explorer: ExplorerType) => {
   if (explorerConfig.hasOwnProperty(explorer)) {
     const selectedExplorer = explorerConfig[explorer]
-
-    // temporary until neon-wallet implements proper
-    // per-network explorer types
-    if (isGoldiNetwork(networkId))
-      return 'https://neo.goldilock.com'
-
-    return isMainNetwork(networkId)
-      ? selectedExplorer.mainNetwork
-      : selectedExplorer.testNetwork
+    switch (networkId) {
+      case MAIN_NETWORK_ID:
+        return selectedExplorer.mainNetwork
+      case TEST_NETWORK_ID:
+        return selectedExplorer.testNetwork
+      case COZ_TEST_NETWORK_ID:
+        return selectedExplorer.cozNetwork
+      case GOLDI_NETWORK_ID:
+        return selectedExplorer.goldiNetwork
+      default:
+        return selectedExplorer.mainNetwork
+    }
   }
+  return explorerConfig[NEO_SCAN]
 }
 
 export const getExplorerTxLink = (networkId: string, explorer: ExplorerType, txId: string) => buildExplorerLink(networkId, explorer, 'trxLinkStructure', txId)
 
-export const getExplorerAddressLink = (networkId: string, explorer: ExplorerType, address: string) => buildExplorerLink(networkId, explorer, 'addressStructure', address)
+export const getExplorerAddressLink = (networkId: string, explorer: ExplorerType, address: string) => buildExplorerLink(networkId, explorer, 'addressLinkStructure', address)
 
 export const getExplorerAssetLink = (networkId: string, explorer: ExplorerType, assetId: string) => buildExplorerLink(networkId, explorer, 'assetLinkStructure', assetId)
 

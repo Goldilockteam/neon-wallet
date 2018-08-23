@@ -1,9 +1,10 @@
 // @flow
 import { MAIN_NETWORK_ID, TEST_NETWORK_ID, COZ_TEST_NETWORK_ID, GOLDI_NETWORK_ID } from './constants'
 
-export const isMainNetwork = (networkId: string) => networkId === MAIN_NETWORK_ID
-export const isTestNetwork = (networkId: string) => networkId === TEST_NETWORK_ID
-export const isGoldiNetwork = (networkId: string) => networkId === GOLDI_NETWORK_ID
+export const isMainNetwork = (networkId: string): boolean => networkId === MAIN_NETWORK_ID
+export const isTestNetwork = (networkId: string): boolean => networkId === TEST_NETWORK_ID
+export const isCozNetwork = (networkId: string): boolean => networkId === COZ_TEST_NETWORK_ID
+export const isGoldiNetwork = (networkId: string): boolean => networkId === GOLDI_NETWORK_ID
 
 export const getNetworks = (): Array<NetworkItemType> => ([
   {
