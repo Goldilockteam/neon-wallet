@@ -3,6 +3,4 @@
 /deploy/node_modules
 /deploy/tmp
 /deploy/www/test.js
-/ssl.sh
-/authy.sh
-/ssh.sh
+/local.conf
