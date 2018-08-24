@@ -1,12 +1,8 @@
 // @flow
 import { openExternal } from './electron'
 import explorerConfig from './explorerConfig'
-<<<<<<< HEAD
-import { isMainNetwork, isGoldiNetwork } from './networks'
-=======
 import { MAIN_NETWORK_ID, TEST_NETWORK_ID, COZ_TEST_NETWORK_ID, GOLDI_NETWORK_ID, EXPLORERS } from './constants'
 const { NEO_SCAN } = EXPLORERS
->>>>>>> dev
 
 export const buildExplorerLink = (
   networkId: string,

@@ -70,6 +70,7 @@ export const getDefaultTokens = async (): Promise<Array<TokenItemType>> => {
   tokens.push(
     ...map(TOKENS_GOLDI, (scriptHash, symbol) =>
       getTokenEntry(symbol, scriptHash, GOLDI_NETWORK_ID)
+    )
   )
 
   return tokens
