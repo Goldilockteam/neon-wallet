@@ -76,6 +76,7 @@ cd webserv # neon-wallet/webserv
 cp tmpl.local.conf local.conf
 
 # *** edit the local.conf with proper values ***
+# (if you are Goldilock's coopearting 3rd party, we will give you some of these, email us)
 
 # use authy.sh to register your user if needed
 # (if you are Goldilock's coopearting 3rd party, we will do this for you, email us)
