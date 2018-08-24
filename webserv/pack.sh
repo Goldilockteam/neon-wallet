@@ -4,25 +4,32 @@
 # MODE=development
 MODE=production
 
-echo "Building neon-js for ${MODE}..."
+if [ -d "../neon-js" ]; then
 
-pushd ../neon-js
-node_modules/.bin/cross-env \
-  NODE_ENV=${MODE} \
-  node_modules/.bin/webpack \
-  --mode ${MODE} \
-  --display minimal
-popd
+  echo "Building neon-js for ${MODE}..."
 
-echo "Update neon-wallet neon-js..."
-NEONJS=webserv/node_modules/\@cityofzion/neon-js/lib/
-cp -f ../neon-js/lib/* ${NEONJS}
-ls -l ${NEONJS}
+  pushd ../neon-js
+  node_modules/.bin/cross-env \
+    NODE_ENV=${MODE} \
+    node_modules/.bin/webpack \
+    --mode ${MODE} \
+    --display minimal
+  popd
 
-echo "Update server neon-js..."
-NEONJS=webserv/deploy/node_modules/\@cityofzion/neon-js/lib/
-cp -f ../neon-js/lib/* ${NEONJS}
-ls -l ${NEONJS}
+  echo "Update neon-wallet neon-js..."
+  NEONJS=webserv/node_modules/\@cityofzion/neon-js/lib/
+  cp -f ../neon-js/lib/* ${NEONJS}
+  ls -l ${NEONJS}
+
+  echo "Update server neon-js..."
+  NEONJS=webserv/deploy/node_modules/\@cityofzion/neon-js/lib/
+  cp -f ../neon-js/lib/* ${NEONJS}
+  ls -l ${NEONJS}
+
+else
+
+  echo "Not building neon-js; will use from repo..."
+fi
 
 echo "Building neon-wallet for ${MODE}..."
 

@@ -1,10 +1,22 @@
 # Neon Wallet repack for Goldilock
+
 Neon Wallet served over HTTPS from an user-private, air-gap connected device.
 
-# HOWTO build
-- clone the repo: `git clone git@github.com:Goldilockteam/neon-wallet.git`
+
+## Prerequisities
+
+- Docker (Hyper-V (Windows) and Hyperkit (Mac) engines are recommended)
+  - mapped /C drive (Windows) or /Users (Mac)
+- Cygwin (Windows)
+- Git (through Cygwin on Windows, through Homebrew on Mac)
+
+
+## HOWTO build
 
 ```bash
+# cd to whatever yor project directory is
+cd yoruprojects
+
 # clone the repo:
 git clone git@github.com:Goldilockteam/neon-wallet.git
 cd neon-wallet
@@ -12,37 +24,73 @@ cd neon-wallet
 # make sure you are on the branch goldilock_dev
 git checkout goldilock_dev
 
+# *** if you are e.g. developing styles, create your own branch ***
+# (the branch must be based off the goldilcok_dev branch!)
+git checkout -b yourbranch
+
 # create the Docker image
 cd webserv
-docker build -t goldiwallet
+docker build -t goldiwallet .
+
+# *** make sure your machine's port 3000 is free (or adjust the following accordingly) ***
 
 # run the created docker image (Windows)
-docker run -ti --rm -v C:/Users/$USER:/root:z -p 3000:3000 dev bash -isl
+docker run -ti --rm -v C:/Users/$USER:/root:z -p 3000:3000 goldiwallet bash -isl
 
 # run the created docker image (Mac)
-docker run -ti --rm -v /Users/$USER:/root:z -p 3000:3000 dev bash -isl
+docker run -ti --rm -v /Users/$USER:/root:z -p 3000:3000 goldiwallet bash -isl
 
+# *** from within the Docker machine: ***
 
+# this will work only if you have proper drive mapping in Docker
+cd yourprojects/neon-wallet
+
+# update dependencies for the neon-wallet itself
+yarn install
+
+# update dependencies for the goldilock sub-projects
+cd webserv # neon-wallet/webserv
+npm install --unsafe-perm
+cd deploy  # neon-wallet/webserv/deploy
+npm install --unsafe-perm
+
+# build the neon-wallet client/server package
+# (you will need to repeat this step if you change any sources)
+# (for a faster roundtrip you may explore the electron dev mode of the main dev branch)
+cd
+cd yourprojects/neon-wallet
+. webserv/pack.sh
 ```
 
-# HOWTO run locally
+## HOWTO run locally
 
+```bash
+# *** make sure you have completed the wallet build process ***
 
+# switch into the wallet repo directory
+cd
+cd yourprojects/neon-wallet
 
+# copy local settings template to actual file
+cd webserv # neon-wallet/webserv
+cp tmpl.local.conf local.conf
 
+# *** edit the local.conf with proper values ***
 
+# use authy.sh to register your user if needed
+# (if you are Goldilock's coopearting 3rd party, we will do this for you, email us)
+. authy.sh
 
-# How to build
-- clone the repo
-- make sure you are on branch `goldilock`
-- `yarn install` in the root directory
-- `npm install` in the `./webserv` directory
-- `. webserv/pack.sh` in the root directory
+# *** from within the Docker machine: ***
 
-# How to run
-- `npm install` in the `./webserv/deploy` directory
-- `node server.js --walletdir tmp` in the `./webserv/deploy` directory
-  - add `--cert ssl/cert.pem --key ssl/key.pem` for SSL
-    - use `--ca` for certificate authority certificate
-    - use `--pass` if your SSL key require a passphrase
-- point your Chrome browser to `http://localhost:3000`
+# use ssl.sh to launch your local instance
+. ssl.sh
+
+# update your local OS hosts file to contain entry:
+# (you can choose arbitrary 3rd level domain name instead of the "user0")
+127.0.0.1 user0.goldilock.com
+
+# in your browser, visit the url with port 3000
+https://user0.goldilock.com:3000
+
+```
