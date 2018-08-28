@@ -76,7 +76,7 @@ const makeRequest = (sendEntries: Array<SendEntryType>, config: Object) => {
 
   if (script === '') {
     return api.sendAsset(
-      { ...config, intents: buildIntents(sendEntries) },
+      { ...config, intents: buildIntents(sendEntries), approvalMessage: sendEntries.approvalMessage },
       api.neoscan
     )
   }
@@ -85,7 +85,8 @@ const makeRequest = (sendEntries: Array<SendEntryType>, config: Object) => {
       ...config,
       intents: buildIntents(sendEntries),
       script,
-      gas: 0
+      gas: 0,
+      approvalMessage: sendEntries.approvalMessage
     },
     api.neoscan
   )
@@ -97,7 +98,7 @@ export const sendTransaction = (sendEntries: Array<SendEntryType>) => (
 ): Promise<*> =>
   new Promise(async (resolve, reject) => {
     const state = getState()
-    const wif = getWIF(state)
+    // const wif = getWIF(state)
     const fromAddress = getAddress(state)
     const net = getNetwork(state)
     const tokenBalances = getTokenBalances(state)
@@ -135,6 +136,16 @@ export const sendTransaction = (sendEntries: Array<SendEntryType>) => (
         })
       )
     }
+    else {
+      sendEntries.approvalMessage = (tx) => {
+        dispatch(
+          showInfoNotification({
+            message: `Please authorize the transaction ${tx.hash} on your smartphone`,
+            autoDismiss: 0
+          })
+        )
+      }
+    }
 
     try {
       const { response } = await makeRequest(sendEntries, {
@@ -142,7 +153,7 @@ export const sendTransaction = (sendEntries: Array<SendEntryType>) => (
         tokensBalanceMap,
         address: fromAddress,
         publicKey,
-        privateKey: new wallet.Account(wif).privateKey,
+        // privateKey: new wallet.Account(wif).privateKey,
         signingFunction: isHardwareSend ? signingFunction : null
       })
 

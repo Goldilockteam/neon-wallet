@@ -21,6 +21,9 @@ export const walletHasKey = (wallet: Object, key: string) =>
 export const walletHasLabel = (wallet: Object, label: string) =>
   wallet.accounts.some(account => account.label === label)
 
+export const walletHasLabel = (wallet: Object, address: string) =>
+  wallet.accounts.some(account => account.address === address)
+
 export const ID = 'accounts'
 
 export const updateAccountsActions = createActions(
@@ -59,7 +62,8 @@ export const saveAccountActions = createActions(
 
     const wallet = await getWallet()
 
-    if (walletHasKey(wallet, key)) {
+    // if (walletHasKey(wallet, key)) {
+    if (walletHasAddress(wallet, address)) { // GOLDILOCK
       throw new Error(`Address '${address}' already exists.`)
     }
 
@@ -75,7 +79,6 @@ export const saveAccountActions = createActions(
 )
 
 export default createActions(ID, () => async (): Promise<Object> => {
-  console.log('GETTING WALLET')
   const wallet = await getWallet()
   return wallet.accounts
 })

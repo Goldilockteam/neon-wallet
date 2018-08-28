@@ -1,0 +1,25 @@
+{
+  "name": "neon-web-server",
+  "version": "0.0.1",
+  "description": "Server side support for Goldilock NEO Wallet",
+  "homepage": "https://github.com/Goldilockteam/neon-wallet",
+  "author": "Goldilock <info@goldilock.com> (https://github.com/Goldilockteam)",
+  "license": "ISC",
+  "dependencies": {
+    "@cityofzion/neon-js": "github:Goldilockteam/neon-js#goldilock_dev",
+    "@mlink/scrypt": "github:youurayy/node-scrypt",
+    "async": "^2.6.0",
+    "authy": "^1.3.1",
+    "es6-promisify": "^6.0.0",
+    "express": "^4.16.3",
+    "fs-extra": "^5.0.0",
+    "lodash": "^4.17.10",
+    "minimist": "^1.2.0",
+    "mkdirp": "^0.5.1",
+    "moment": "^2.22.1",
+    "rimraf": "^2.6.2",
+    "rwlock": "^5.0.0",
+    "utilz": "^0.1.14",
+    "ws": "^5.1.1"
+  }
+}

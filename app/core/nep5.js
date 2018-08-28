@@ -7,8 +7,10 @@ import { COIN_DECIMAL_LENGTH } from './formatters'
 import {
   TOKENS,
   TOKENS_TEST,
+  TOKENS_GOLDI,
   MAIN_NETWORK_ID,
-  TEST_NETWORK_ID
+  TEST_NETWORK_ID,
+  GOLDI_NETWORK_ID
 } from './constants'
 
 let fetchedTokens
@@ -69,6 +71,11 @@ export const getDefaultTokens = async (): Promise<Array<TokenItemType>> => {
   tokens.push(
     ...map(TOKENS_TEST, (scriptHash, symbol) =>
       getTokenEntry(symbol, scriptHash, TEST_NETWORK_ID)
+    )
+  )
+  tokens.push(
+    ...map(TOKENS_GOLDI, (scriptHash, symbol) =>
+      getTokenEntry(symbol, scriptHash, GOLDI_NETWORK_ID)
     )
   )
 

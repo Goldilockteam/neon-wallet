@@ -224,7 +224,7 @@ export default class Settings extends Component<Props, State> {
             <NetworkSwitch />
           </div>
 
-          <div className="settingsItem">
+          {/* <div className="settingsItem">
             <div className="itemTitle">Saved Wallet Accounts</div>
             {map(accounts, account => (
               <div className="walletList" key={`wallet${account.key}`}>
@@ -248,7 +248,7 @@ export default class Settings extends Component<Props, State> {
           </Button>
           <Button onClick={this.loadWalletRecovery}>
             Load wallet recovery file
-          </Button>
+          </Button> */}
         </div>
       </div>
     )

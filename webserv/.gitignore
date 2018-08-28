@@ -1,0 +1,6 @@
+/node_modules
+/lib/node_modules
+/deploy/node_modules
+/deploy/tmp
+/deploy/www/test.js
+/local.conf
