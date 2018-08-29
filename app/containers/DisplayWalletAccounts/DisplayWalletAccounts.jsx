@@ -75,10 +75,18 @@ class DisplayWalletAccounts extends Component<Props> {
             icon={<WarningIcon />}
             renderText={() => (
               <div className={styles.saveDetails}>
+                {/*
                 <div>
                   <b>Save these details!</b> If you lose these credentials,{' '}
                 </div>
                 <div>you lose access to your assets.</div>
+                */}
+                <b>IMPORTANT - READ CAREFULLY:</b><br/>
+                After you press Save Account, your encrypted private key will be stored and protected by Goldilock.<br/>
+                Make sure to backup the passphrase, as your passphrase will never be stored by Goldilock, and if you lose it, Goldilock will not be able do decrypt your private key and you will lose access to your assets.<br/>
+                You can also save and backup the private key yourself, but Goldilock cannot protect and cannot be held accountable for key copies saved externally. Therefore, if you decide to backup your encrypted private key, choose your physical backup location very carefuly.
+                A backed-up encrypted private key, along with the passphrase, can be used to log into any stock Neon Wallet. This should only ever be done in the case of Goldilock not being able to provide its services anymore.<br/>
+                <b>IMPORTANT:</b> Verify that you can log in to the account and see the correct public address before sending anything to the address below!
               </div>
             )}
             className={styles.displayWalletAccountsDialogue}
