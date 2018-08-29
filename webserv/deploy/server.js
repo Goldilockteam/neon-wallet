@@ -78,6 +78,7 @@ const loadAccount = async (address) => {
     throw new Error('no wallet')
   if(!wallet.accounts || !wallet.accounts.length)
     throw new Error('no wallet accounts')
+  console.log(`looking for address: ${address}`)
   const account = wallet.accounts.find(acc => acc.address === address)
   if(!account)
     throw new Error('account not found')

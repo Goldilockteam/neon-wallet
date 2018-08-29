@@ -21,7 +21,7 @@ export const walletHasKey = (wallet: Object, key: string) =>
 export const walletHasLabel = (wallet: Object, label: string) =>
   wallet.accounts.some(account => account.label === label)
 
-export const walletHasLabel = (wallet: Object, address: string) =>
+export const walletHasAddress = (wallet: Object, address: string) =>
   wallet.accounts.some(account => account.address === address)
 
 export const ID = 'accounts'

@@ -3,8 +3,8 @@
 
 # MODE=development
 MODE=production
-
-if [ -d "../neon-js" ]; then
+if false; then
+#if [ -d "../neon-js" ]; then
 
   echo "Building neon-js for ${MODE}..."
 
