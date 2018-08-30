@@ -208,7 +208,8 @@ export default class Send extends React.Component<Props, State> {
     })
   }
 
-  handleSubmit = () => {
+  handleSubmit = (event: Object) => {
+    event.preventDefault()
     const rows = [...this.state.sendRowDetails]
     const promises = rows.map((row: Object, index: number) =>
       this.validateRow(row, index)

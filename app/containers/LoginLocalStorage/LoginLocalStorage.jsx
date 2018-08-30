@@ -29,7 +29,7 @@ export default class LoginLocalStorage extends Component<Props, State> {
     const { passphrase, encryptedWIF } = this.state
     const { label } =
       (Array.isArray(accounts) &&
-        accounts.find(account => account.key === encryptedWIF)) ||
+        accounts.find(account => account.address === encryptedWIF)) ||
       {}
 
     return (
@@ -48,7 +48,7 @@ export default class LoginLocalStorage extends Component<Props, State> {
               onChange={value => this.setState({ encryptedWIF: value })}
               getItemValue={value =>
                 Array.isArray(accounts) &&
-                accounts.find(account => account.label === value).key
+                accounts.find(account => account.label === value).address
               }
             />
           </div>
