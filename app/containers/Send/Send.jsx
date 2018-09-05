@@ -224,7 +224,8 @@ export default class Send extends React.Component<Props, State> {
     })
   }
 
-  handleSend = () => {
+  handleSend = (event: Object) => {
+    event.preventDefault()
     const { sendTransaction } = this.props
     const { sendRowDetails } = this.state
 
