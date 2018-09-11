@@ -27,7 +27,7 @@ const LOGIN_OPTIONS = {
   LOCAL_STORAGE: {
     render: () => <LoginLocalStorage />,
     display: 'Saved Wallet'
-  },
+  }/*,
   PRIVATE_KEY: {
     render: () => <LoginPrivateKey />,
     display: 'Private Key'
@@ -39,7 +39,7 @@ const LOGIN_OPTIONS = {
   ledger: {
     render: () => <LoginLedgerNanoS />,
     display: 'Ledger'
-  }
+  }*/
 }
 
 export default class Home extends React.Component<Props, State> {
@@ -83,6 +83,7 @@ export default class Home extends React.Component<Props, State> {
                 </Button>
               </Link>
             </div>
+            {/*
             <div className={styles.buttonContainer}>
               <Link to={ROUTES.IMPORT_WALLET}>
                 <Button disabled={loading} renderIcon={ImportIcon}>
@@ -90,6 +91,7 @@ export default class Home extends React.Component<Props, State> {
                 </Button>
               </Link>
             </div>
+            */}
           </div>
           <div className={styles.versionNumber}>{`v${pack.version}`}</div>
         </div>

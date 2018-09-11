@@ -1,7 +1,8 @@
 // @flow
 import { createActions } from 'spunky'
 
-import { MAIN_NETWORK_ID } from '../core/constants'
+// import { MAIN_NETWORK_ID } from '../core/constants'
+import { TEST_NETWORK_ID } from '../core/constants'
 
 type Props = {
   networkId: string
@@ -10,5 +11,6 @@ type Props = {
 export const ID = 'network'
 
 export default createActions(ID, ({ networkId }: Props = {}) => () =>
-  networkId || MAIN_NETWORK_ID
+  // networkId || MAIN_NETWORK_ID
+  networkId || TEST_NETWORK_ID
 )

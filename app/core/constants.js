@@ -65,8 +65,10 @@ export const MODAL_TYPES = {
   ADD_CONTACT: 'ADD_CONTACT'
 }
 
-export const MAIN_NETWORK_ID = '1'
+// export const MAIN_NETWORK_ID = '1'
 export const TEST_NETWORK_ID = '2'
+// export const COZ_TEST_NETWORK_ID = '3'
+// export const GOLDI_NETWORK_ID = '4'
 
 // TestNet
 export const TOKENS_TEST = {

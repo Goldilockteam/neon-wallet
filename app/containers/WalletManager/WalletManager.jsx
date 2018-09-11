@@ -42,6 +42,7 @@ class WalletManager extends Component<Props> {
               <h2>Manage Wallets</h2>
             </div>
             <div className={styles.buttonRow}>
+              {/*
               <NavLink
                 id="import-wallet-authenticated-link"
                 exact
@@ -49,6 +50,7 @@ class WalletManager extends Component<Props> {
               >
                 <Button renderIcon={Import}>Import</Button>
               </NavLink>
+              */}
               <NavLink
                 id="create-wallet-authenticated-link"
                 exact

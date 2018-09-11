@@ -8,9 +8,9 @@ import {
   TOKENS,
   TOKENS_TEST,
   TOKENS_GOLDI,
-  MAIN_NETWORK_ID,
-  TEST_NETWORK_ID,
-  GOLDI_NETWORK_ID
+  // MAIN_NETWORK_ID,
+  TEST_NETWORK_ID//,
+  // GOLDI_NETWORK_ID
 } from './constants'
 
 let fetchedTokens
@@ -42,6 +42,7 @@ const getTokenEntry = ((): Function => {
 
 export const getDefaultTokens = async (): Promise<Array<TokenItemType>> => {
   const tokens = []
+  /*
   // Prevent duplicate requests here
   if (!fetchedTokens) {
     const response = await axios
@@ -72,16 +73,19 @@ export const getDefaultTokens = async (): Promise<Array<TokenItemType>> => {
       )
     )
   )
+  */
   tokens.push(
     ...map(TOKENS_TEST, (scriptHash, symbol) =>
       getTokenEntry(symbol, scriptHash, TEST_NETWORK_ID)
     )
   )
+  /*
   tokens.push(
     ...map(TOKENS_GOLDI, (scriptHash, symbol) =>
       getTokenEntry(symbol, scriptHash, GOLDI_NETWORK_ID)
     )
   )
+  */
 
   return tokens
 }
