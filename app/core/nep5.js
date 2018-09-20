@@ -28,7 +28,8 @@ const getTokenEntry = ((): Function => {
     scriptHash: string,
     networkId: string,
     image: string,
-    name: string
+    name: string,
+    decimals: number
   ) => ({
     id: `${id++}`, // eslint-disable-line no-plusplus
     symbol,
@@ -36,7 +37,8 @@ const getTokenEntry = ((): Function => {
     networkId,
     isUserGenerated: false,
     image,
-    name
+    name,
+    decimals
   })
 })()
 
@@ -69,7 +71,8 @@ export const getDefaultTokens = async (): Promise<Array<TokenItemType>> => {
         tokenData.networks['1'].hash,
         MAIN_NETWORK_ID,
         tokenData.image,
-        tokenData.networks['1'].name
+        tokenData.networks['1'].name,
+        tokenData.networks['1'].decimals
       )
     )
   )
