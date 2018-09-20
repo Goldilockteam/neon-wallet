@@ -5,10 +5,10 @@
     requests: {},
     connected: false,
     buffer: [],
-    timer: setInterval(function() {
-      if(window._comm.heartbeat)
-        window._comm.heartbeat();
-    }, 5000)
+    timer: null,
+    reload: null,
+    hbidSent: 0,
+    hbidReceived: 0
   };
 
   var connect = function() {
@@ -30,8 +30,14 @@
     };
 
     window._comm.heartbeat = function() {
-      if(window._comm.connected)
-        socket.send('true');
+      if(!window._comm.connected ||
+        window._comm.hbidSent != window._comm.hbidReceived)
+        return window._comm.reload()
+      window._comm
+        .req({ fn: 'heartbeat', hbid: window._comm.hbidSent++ })
+        .then(function(rcv) {
+          window._comm.hbidReceived = rcv;
+      });
     };
 
     var send = function(json) {
@@ -47,10 +53,19 @@
     }
 
     socket.onopen = function() {
+      if(window._comm.connected)
+        return;
+
       var b = window._comm.buffer;
       while(b.length)
         send(b.shift());
       window._comm.connected = true;
+
+      window._comm.timer = setInterval(function() {
+        if(window._comm.heartbeat)
+          window._comm.heartbeat();
+      }, 5000);
+
       console.log('ws connected');
       window._comm.req({ fn: 'authy-login-code' }).then(function(authyCode) {
         if(authyCode === 0)
@@ -67,7 +82,8 @@
       console.error(err);
     };
 
-    socket.onclose = function(err) {
+    window._comm.reload = socket.onclose = function(err) {
+      console.log('ws disconnected; reloading page');
       window._comm.connected = false;
       // TODO display a dialog before redirecting
       window.location.href = '/'

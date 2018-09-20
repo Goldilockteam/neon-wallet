@@ -140,8 +140,9 @@ wss.on('connection', (ws) => {
   ws.on('message', async (json) => {
     let msg = JSON.parse(json)
     try {
-      if(msg === true) // heartbeat
+      if(msg === true) // old heartbeat
         return
+
       // {
       //   "name":"userWallet",
       //   "version":"1.0",
@@ -161,7 +162,10 @@ wss.on('connection', (ws) => {
 
       console.log(`request start: ${msg.fn} ${msg.id} ${msg.key}`)
 
-      if(msg.fn == 'authy-login-code') {
+      if(msg.fn == 'heartbeat') {
+        await wsSend({ id: msg.id, data: ++msg.hbid })
+      }
+      else if(msg.fn == 'authy-login-code') {
         // TODO ban the IP after 3 retries
         // generate authy code for identification purposes
         if(args.authyLoginEnabled === 'true') {
