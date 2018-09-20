@@ -21,3 +21,5 @@ body {
 #gd-authy-code {
   color: red;
 }
+
+input { height: auto !important; }
