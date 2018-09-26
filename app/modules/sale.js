@@ -1,6 +1,6 @@
 // @flow
 import { wallet, api } from 'neon-js'
-import { flatten } from 'lodash'
+import { flatten } from 'lodash-es'
 
 import {
   showErrorNotification,
@@ -51,7 +51,7 @@ export const participateInSale = (
 
   if (!isValid) {
     dispatch(showErrorNotification({ message }))
-    return false
+    throw new Error(`Invalid parameters: ${message}`)
   }
 
   const formattedScriptHash =
@@ -112,7 +112,7 @@ export const participateInSale = (
         message: `Sale participation failed: ${err.message}`
       })
     )
-    return false
+    throw new Error(`${err.message}`)
   }
 
   // $FlowFixMe

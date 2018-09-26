@@ -8,6 +8,7 @@ import Settings from './Settings'
 import withExplorerData from '../../hocs/withExplorerData'
 import withCurrencyData from '../../hocs/withCurrencyData'
 import withThemeData from '../../hocs/withThemeData'
+import withPricesData from '../../hocs/withPricesData'
 import accountsActions, {
   updateAccountsActions
 } from '../../actions/accountsActions'
@@ -19,7 +20,7 @@ import {
 } from '../../modules/notifications'
 import { showModal } from '../../modules/modal'
 
-const mapStateToProps = (state: Object) => ({
+const mapStateToProps = () => ({
   networks: getNetworks()
 })
 
@@ -61,6 +62,7 @@ export default compose(
     mapDispatchToProps
   ),
   withData(accountsActions, mapAccountsDataToProps),
+  withPricesData(),
   withExplorerData(),
   withCurrencyData(),
   withThemeData(),

@@ -11,6 +11,7 @@ import HistoryIcon from '../../../assets/navigation/history.svg'
 import SendIcon from '../../../assets/navigation/send.svg'
 import ReceiveIcon from '../../../assets/navigation/receive.svg'
 import ContactsIcon from '../../../assets/navigation/contacts.svg'
+import VotingIcon from '../../../assets/navigation/bars.svg'
 import TokenSaleIcon from '../../../assets/navigation/tokens.svg'
 import SettingsIcon from '../../../assets/navigation/settings.svg'
 import { ROUTES } from '../../../core/constants'
@@ -29,103 +30,97 @@ const Sidebar = ({ className, showTokenSaleModal }: Props) => (
         <img src={LogoWithoutText} alt="neon-logo" />
       </div>
 
-      <Tooltip title="Dashboard" position="right">
-        <NavLink
-          id="dashboard"
-          exact
-          to={ROUTES.DASHBOARD}
-          className={styles.navItem}
-          activeClassName={styles.active}
-        >
-          <HomeIcon />
-          <div> Wallet </div>
-        </NavLink>
+      <NavLink
+        id="dashboard"
+        exact
+        to={ROUTES.DASHBOARD}
+        className={styles.navItem}
+        activeClassName={styles.active}
+      >
+        <HomeIcon />
+        <div> Wallet </div>
+      </NavLink>
+
+      <NavLink
+        id="history"
+        exact
+        to={ROUTES.TRANSACTION_HISTORY}
+        className={styles.navItem}
+        activeClassName={styles.active}
+      >
+        <HistoryIcon />
+        <div> Activity </div>
+      </NavLink>
+
+      <NavLink
+        id="send"
+        exact
+        to={ROUTES.SEND}
+        className={styles.navItem}
+        activeClassName={styles.active}
+      >
+        <SendIcon />
+        <div> Send </div>
+      </NavLink>
+
+      <NavLink
+        id="receive"
+        exact
+        to={ROUTES.RECEIVE}
+        className={styles.navItem}
+        activeClassName={styles.active}
+      >
+        <ReceiveIcon />
+        <div> Receive </div>
+      </NavLink>
+
+      <NavLink
+        id="contacts"
+        to={ROUTES.CONTACTS}
+        className={styles.navItem}
+        activeClassName={styles.active}
+      >
+        <ContactsIcon />
+        <div> Contacts </div>
+      </NavLink>
+
+      <NavLink
+        id="tokensale"
+        to={ROUTES.TOKEN_SALE}
+        className={styles.navItem}
+        activeClassName={styles.active}
+      >
+        <TokenSaleIcon />
+        <div> Token Sale </div>
+      </NavLink>
+
+      <Tooltip title="Coming Soon" position="right">
+        <div id="voting" className={styles.disabledNavIem}>
+          <VotingIcon />
+          <div> Voting </div>
+        </div>
       </Tooltip>
 
-      <Tooltip title="Transaction History" position="right">
-        <NavLink
-          id="history"
-          exact
-          to={ROUTES.TRANSACTION_HISTORY}
-          className={styles.navItem}
-          activeClassName={styles.active}
-        >
-          <HistoryIcon />
-          <div> Activity </div>
-        </NavLink>
-      </Tooltip>
-
-      <Tooltip title="Send" position="right">
-        <NavLink
-          id="send"
-          exact
-          to={ROUTES.SEND}
-          className={styles.navItem}
-          activeClassName={styles.active}
-        >
-          <SendIcon />
-          <div> Send </div>
-        </NavLink>
-      </Tooltip>
-
-      <Tooltip title="Receive" position="right">
-        <NavLink
-          id="receive"
-          exact
-          to={ROUTES.RECEIVE}
-          className={styles.navItem}
-          activeClassName={styles.active}
-        >
-          <ReceiveIcon />
-          <div> Receive </div>
-        </NavLink>
-      </Tooltip>
-
-      <Tooltip title="Contacts" position="right">
-        <NavLink
-          id="contacts"
-          to={ROUTES.CONTACTS}
-          className={styles.navItem}
-          activeClassName={styles.active}
-        >
-          <ContactsIcon />
-          <div> Contacts </div>
-        </NavLink>
-      </Tooltip>
-
-      <Tooltip title="Token Sale" position="right">
-        <a
-          id="tokenSale"
-          className={styles.navItem}
-          onClick={showTokenSaleModal}
-        >
-          <TokenSaleIcon />
-          <div> Token Sale </div>
-        </a>
-      </Tooltip>
-
-      <Tooltip title="Settings" position="right">
-        <NavLink
-          id="settings"
-          to={ROUTES.SETTINGS}
-          className={styles.navItem}
-          activeClassName={styles.active}
-        >
-          <SettingsIcon />
-          <div> Settings </div>
-        </NavLink>
-      </Tooltip>
+      <NavLink
+        id="settings"
+        to={ROUTES.SETTINGS}
+        className={styles.navItem}
+        activeClassName={styles.active}
+      >
+        <SettingsIcon />
+        <div> Settings </div>
+      </NavLink>
     </div>
 
-    <div className={styles.group}>
-      <Tooltip
-        className={classNames(styles.logoutToolTipGroup, styles.navItem)}
-        title="Logout"
-        position="right"
-      >
-        <Logout id="logout" />
-        <div className={styles.logoutText}> Logout </div>
-      </Tooltip>
+    <div
+      className={classNames(
+        styles.group,
+        styles.logoutToolTipGroup,
+        styles.navItem
+      )}
+    >
+      <Logout id="logout" />
+      <div className={styles.logoutText}> Logout </div>
     </div>
   </div>
 )

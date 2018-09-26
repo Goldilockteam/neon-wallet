@@ -2,13 +2,14 @@
 import React from 'react'
 import Highlighter from 'react-highlight-words'
 import classNames from 'classnames'
-import { noop, omit, trim, includes, toLower } from 'lodash'
+import { noop, omit, trim, includes, toLower } from 'lodash-es'
 
 import TextInput from '../TextInput'
 import Dropdown from './Dropdown'
 import DropdownButton from './DropdownButton'
 
 import styles from './SelectInput.scss'
+import uniqueKey from '../../../util/uniqueKey'
 
 type Props = {
   className?: string,
@@ -42,6 +43,7 @@ const defaultRenderAfter = (props: Props) => <DropdownButton {...props} />
 const defaultItemValue = (item: string) => item
 
 const defaultSearchResults = (items: Array<*>, term: string) =>
+  // $FlowFixMe
   items.filter(item => includes(toLower(item), toLower(term)))
 
 export default class SelectInput extends React.Component<Props, State> {
@@ -140,7 +142,7 @@ export default class SelectInput extends React.Component<Props, State> {
     return (
       <div
         className={styles.dropdownItem}
-        key={value}
+        key={uniqueKey()}
         aria-label={value}
         onClick={onSelect}
       >

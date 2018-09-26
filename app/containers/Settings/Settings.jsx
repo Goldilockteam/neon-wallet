@@ -1,18 +1,32 @@
 // @flow
 import React, { Component } from 'react'
-import { map, reject } from 'lodash'
+import { map, reject } from 'lodash-es'
 import fs from 'fs'
 import storage from 'electron-json-storage'
+import { Link } from 'react-router-dom'
 
-import Delete from 'react-icons/lib/md/delete'
-import NetworkSwitch from '../App/Sidebar/NetworkSwitch'
 import { recoverWallet } from '../../modules/generateWallet'
-
-import Button from '../../components/Button'
-import { EXPLORERS, MODAL_TYPES, CURRENCIES } from '../../core/constants'
+import Panel from '../../components/Panel'
+import SelectInput from '../../components/Inputs/SelectInput'
+import StyledReactSelect from '../../components/Inputs/StyledReactSelect/StyledReactSelect'
+import HeaderBar from '../../components/HeaderBar'
+import SettingsItem from '../../components/Settings/SettingsItem'
+import SettingsLink from '../../components/Settings/SettingsLink'
+import WalletRecoveryPanel from '../../components/Settings/WalletRecoveryPanel'
+import {
+  EXPLORERS,
+  CURRENCIES,
+  ROUTES,
+  MODAL_TYPES,
+  COZ_DONATIONS_ADDRESS,
+  DISCORD_INVITE_LINK
+} from '../../core/constants'
 import themes from '../../themes'
+import styles from './Settings.scss'
+import Tooltip from '../../components/Tooltip'
+import AddIcon from '../../assets/icons/add.svg'
 
-const { dialog } = require('electron').remote
+const { dialog, shell } = require('electron').remote
 
 type Props = {
   setAccounts: (Array<Object>) => any,
@@ -22,17 +36,38 @@ type Props = {
   currency: string,
   setTheme: string => any,
   theme: string,
-  accounts: any,
-  showModal: Function,
   showSuccessNotification: Object => any,
-  showErrorNotification: Object => any
+  showErrorNotification: Object => any,
+  showModal: Function
+}
+
+type SelectOption = {
+  value: string,
+  label: string
 }
 
 type State = {
-  explorer: string
+  selectedCurrency: SelectOption,
+  selectedTheme: SelectOption,
+  selectedExplorer: SelectOption
 }
 
 export default class Settings extends Component<Props, State> {
+  state = {
+    selectedCurrency: {
+      value: this.props.currency,
+      label: this.props.currency.toUpperCase()
+    },
+    selectedTheme: {
+      value: this.props.theme,
+      label: this.props.theme
+    },
+    selectedExplorer: {
+      value: this.props.explorer,
+      label: EXPLORERS[this.props.explorer] || EXPLORERS.NEO_SCAN
+    }
+  }
+
   saveWalletRecovery = () => {
     const { showSuccessNotification, showErrorNotification } = this.props
 
@@ -48,7 +83,12 @@ export default class Settings extends Component<Props, State> {
       const content = JSON.stringify(data)
       dialog.showSaveDialog(
         {
-          filters: [{ name: 'JSON', extensions: ['json'] }]
+          filters: [
+            {
+              name: 'JSON',
+              extensions: ['json']
+            }
+          ]
         },
         fileName => {
           if (fileName === undefined) {
@@ -109,63 +149,21 @@ export default class Settings extends Component<Props, State> {
     })
   }
 
-  updateExplorerSettings = (e: Object) => {
+  updateExplorerSettings = (option: SelectOption) => {
+    this.setState({ selectedExplorer: option })
     const { setBlockExplorer } = this.props
-    setBlockExplorer(e.target.value)
+    setBlockExplorer(option.label)
   }
 
-  updateCurrencySettings = (e: Object) => {
+  updateCurrencySettings = (option: SelectOption) => {
+    this.setState({ selectedCurrency: option })
     const { setCurrency } = this.props
-    setCurrency(e.target.value)
+    setCurrency(option.value)
   }
 
-  updateThemeSettings = (e: Object) => {
+  updateThemeSettings = (option: SelectOption) => {
     const { setTheme } = this.props
-    setTheme(e.target.value)
-  }
-
-  deleteWalletAccount = (label: string, key: string) => {
-    const {
-      showSuccessNotification,
-      showErrorNotification,
-      setAccounts,
-      showModal
-    } = this.props
-
-    showModal(MODAL_TYPES.CONFIRM, {
-      title: 'Confirm Delete',
-      text: `Please confirm deleting saved wallet - ${label}`,
-      onClick: () => {
-        storage.get('userWallet', (readError, data) => {
-          if (readError) {
-            showErrorNotification({
-              message: `An error occurred reading previously stored wallet: ${
-                readError.message
-              }`
-            })
-            return
-          }
-
-          // eslint-disable-next-line
-          data.accounts = reject(data.accounts, { key })
-
-          storage.set('userWallet', data, saveError => {
-            if (saveError) {
-              showErrorNotification({
-                message: `An error occurred updating the wallet: ${
-                  saveError.message
-                }`
-              })
-            } else {
-              showSuccessNotification({
-                message: 'Account deletion was successful.'
-              })
-              setAccounts(data.accounts)
-            }
-          })
-        })
-      }
-    })
+    setTheme(option.value)
   }
 
   openTokenModal = () => {
@@ -173,80 +171,101 @@ export default class Settings extends Component<Props, State> {
   }
 
   render() {
-    const { accounts, explorer, currency, theme } = this.props
+    const { selectedCurrency, selectedExplorer } = this.state
+    const parsedCurrencyOptions = Object.keys(CURRENCIES).map(key => ({
+      value: key,
+      label: key.toUpperCase()
+    }))
+    const parsedExplorerOptions = Object.keys(EXPLORERS).map(key => ({
+      value: key,
+      label: EXPLORERS[key]
+    }))
 
     return (
-      <div id="settings">
-        <div className="description">
-          Manage your Neon wallet accounts and settings
-        </div>
-        <div className="settingsForm">
-          <div className="settingsItem">
-            <div className="itemTitle">Tokens</div>
-            <Button onClick={this.openTokenModal}>Manage Tokens</Button>
-          </div>
-          <div className="settingsItem">
-            <div className="itemTitle">Theme</div>
-            <select value={theme} onChange={this.updateThemeSettings}>
-              {Object.keys(themes).map((themeName: string) => (
-                <option value={themeName} key={themeName}>
-                  {themeName}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="settingsItem">
-            <div className="itemTitle">Block Explorer</div>
-            <select value={explorer} onChange={this.updateExplorerSettings}>
-              {Object.keys(EXPLORERS).map((explorer: ExplorerType) => (
-                <option key={explorer} value={EXPLORERS[explorer]}>
-                  {EXPLORERS[explorer]}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="settingsItem">
-            <div className="itemTitle">Currency</div>
-            <select value={currency} onChange={this.updateCurrencySettings}>
-              {Object.keys(CURRENCIES).map((currencyCode: string) => (
-                <option value={currencyCode} key={currencyCode}>
-                  {currencyCode.toUpperCase()}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="settingsItem">
-            <div className="itemTitle">Network</div>
-            <NetworkSwitch />
-          </div>
-
-          {/* <div className="settingsItem">
-            <div className="itemTitle">Saved Wallet Accounts</div>
-            {map(accounts, account => (
-              <div className="walletList" key={`wallet${account.key}`}>
-                <div className="walletItem">
-                  <div className="walletName">{account.key.slice(0, 20)}</div>
-                  <div className="walletKey">{account.label}</div>
-                  <div
-                    className="deleteWallet"
-                    onClick={() =>
-                      this.deleteWalletAccount(account.label, account.key)
-                    }
-                  >
-                    <Delete />
-                  </div>
-                </div>
+      <section className={styles.settingsContainer}>
+        <HeaderBar
+          label="Settings"
+          renderRightContent={this.renderHeaderBarRightContent}
+        />
+        <Panel
+          className={styles.settingsPanel}
+          renderHeader={this.renderHeader}
+        >
+          <section className={styles.settingsItemsContainer}>
+            <SettingsItem title="THEME">
+              <div className={styles.settingsSelectContainer}>
+                <StyledReactSelect
+                  isDisabled
+                  value={this.state.selectedTheme}
+                />
               </div>
-            ))}
-          </div>
-          <Button onClick={() => this.saveWalletRecovery()}>
-            Export wallet recovery file
-          </Button>
-          <Button onClick={this.loadWalletRecovery}>
-            Load wallet recovery file
-          </Button> */}
-        </div>
-      </div>
+            </SettingsItem>
+            <SettingsItem title="CURRENCY">
+              <div className={styles.settingsSelectContainer}>
+                <StyledReactSelect
+                  options={parsedCurrencyOptions}
+                  value={this.state.selectedCurrency}
+                  onChange={this.updateCurrencySettings}
+                />
+              </div>
+            </SettingsItem>
+            <SettingsItem title="BLOCK EXPLORER">
+              <div className={styles.settingsSelectContainer}>
+                <StyledReactSelect
+                  options={parsedExplorerOptions}
+                  value={this.state.selectedExplorer}
+                  onChange={this.updateExplorerSettings}
+                />
+              </div>
+            </SettingsItem>
+            {/*
+            <SettingsLink to={ROUTES.ENCRYPT} title="ENCRYPT A KEY" />
+            */}
+            <SettingsLink to={ROUTES.NODE_SELECT} title="NODE SELECTON" />
+            {/*
+            <WalletRecoveryPanel
+              title="WALLET RECOVERY"
+              loadWalletRecovery={this.loadWalletRecovery}
+              saveWalletRecovery={this.saveWalletRecovery}
+            />
+            */}
+            {this.renderDontions()}
+          </section>
+        </Panel>
+      </section>
     )
   }
+
+  renderDontions = () => (
+    <Link
+      to={{
+        pathname: ROUTES.SEND,
+        state: { address: COZ_DONATIONS_ADDRESS }
+      }}
+      className={styles.settingsDonations}
+    >
+      Created by CoZ. Donations: {COZ_DONATIONS_ADDRESS}
+    </Link>
+  )
+
+  renderHeaderBarRightContent = () => (
+    <Tooltip title="Add Token" className={styles.headerButtonContainer}>
+      <AddIcon className={styles.add} />
+      <span>Add Token</span>
+    </Tooltip>
+  )
+
+  openDiscordLink = () => shell.openExternal(DISCORD_INVITE_LINK)
+
+  renderHeader = () => (
+    <div className={styles.settingsPanelHeader}>
+      <div className={styles.settingsPanelHeaderItem}>
+        Manage your neon wallet
+      </div>
+      <div className={styles.settingsPanelHeaderItem}>
+        Community Support:{' '}
+        <a onClick={this.openDiscordLink}>{DISCORD_INVITE_LINK}</a>
+      </div>
+    </div>
+  )
 }

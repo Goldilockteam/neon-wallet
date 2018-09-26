@@ -1,7 +1,7 @@
 // @flow
 import React from 'react'
 import classNames from 'classnames'
-import { omit } from 'lodash'
+import { omit } from 'lodash-es'
 
 import RefreshIcon from '../../assets/icons/refresh.svg'
 
@@ -10,10 +10,10 @@ import styles from './HeaderBar.scss'
 type Props = {
   label: string,
   shouldRenderRefresh: boolean,
-  renderLeftContent: () => any,
-  renderRightContent: () => any,
-  loadWalletData: Function,
-  loading: boolean
+  renderLeftContent?: () => any,
+  renderRightContent?: () => any,
+  loadWalletData?: Function,
+  loading?: boolean
 }
 
 export default class HeaderBar extends React.PureComponent<Props> {
@@ -25,8 +25,8 @@ export default class HeaderBar extends React.PureComponent<Props> {
     const {
       label,
       shouldRenderRefresh = false,
-      renderLeftContent,
-      renderRightContent,
+      renderLeftContent = () => null,
+      renderRightContent = () => null,
       loadWalletData,
       loading
     } = this.props
