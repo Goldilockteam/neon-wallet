@@ -21,11 +21,11 @@ cd yoruprojects
 git clone git@github.com:Goldilockteam/neon-wallet.git
 cd neon-wallet
 
-# make sure you are on the branch goldilock_dev
-git checkout goldilock_dev
+# make sure you are on the branch goldilock-design-v2
+git checkout goldilock-design-v2
 
 # *** if you are e.g. developing styles, create your own branch ***
-# (the branch must be based off the goldilcok_dev branch!)
+# (the branch must be based off the goldilock-design-v2 branch!)
 git checkout -b yourbranch
 
 # create the Docker image
@@ -85,6 +85,7 @@ cp tmpl.local.conf local.conf
 # *** from within the Docker machine: ***
 
 # use ssl.sh to launch your local instance
+$ (You can use ". http.sh" to start without HTTPS)
 . ssl.sh
 
 # update your local OS hosts file to contain entry:
