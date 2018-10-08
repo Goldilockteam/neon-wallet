@@ -2,36 +2,36 @@
 
 @font-face {
   font-family: 'Gotham';
-  src: url('../assets/fonts/Gotham-Book.otf') format('truetype');
+  src: url('../assets/fonts/Gotham-Book.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: 'Gotham';
-  src: url('../assets/fonts/Gotham-Bold.otf') format('truetype');
+  src: url('../assets/fonts/Gotham-Bold.woff') format('woff');
   font-weight: bold;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Gotham-Medium';
-  src: url('../assets/fonts/Gotham-Medium.otf');
+  src: url('../assets/fonts/Gotham-Medium.woff') format('woff');
 }
 @font-face {
   font-family: 'Gotham-Bold';
-  src: url('../assets/fonts/Gotham-Bold.otf');
+  src: url('../assets/fonts/Gotham-Bold.woff') format('woff');
 }
 @font-face {
   font-family: 'Gotham-Light';
-  src: url('../assets/fonts/Gotham-Light.otf');
+  src: url('../assets/fonts/Gotham-Light.woff') format('woff');
 }
 @font-face {
   font-family: 'Gotham-Thin';
-  src: url('../assets/fonts/Gotham-Thin.otf');
+  src: url('../assets/fonts/Gotham-Thin.woff') format('woff');
 }
 @font-face {
   font-family: 'Gotham-Book';
-  src: url('../assets/fonts/Gotham-Book.otf');
+  src: url('../assets/fonts/Gotham-Book.woff') format('woff');
 }
 
 @media print {
@@ -188,7 +188,6 @@ input {
     padding: 7px 15px;
     line-height: $text-input-height;
     color: $text-input-color;
-    border: 2px transparent;
     background: $text-input-background-color;
     font-size: $text-input-font-size;
     border-radius: $text-input-border-radius;
@@ -207,6 +206,7 @@ input {
 
   .react-select__option--is-focused {
     background: $main-background;
+    cursor: pointer;
   }
 
   .react-select__option--is-selected {
@@ -220,11 +220,11 @@ input {
     max-height: 180px;
     overflow: auto;
     background: #f2f2f2;
-    border: 2px solid #323242;
     border-top: none;
     border-radius: 0 0 4px 4px;
     margin-top: -8px;
     z-index: 1;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   }
 
   .react-select__control--is-focused {
@@ -235,5 +235,15 @@ input {
     .react-select__value-container {
       padding: 7px 13px;
     }
+  }
+}
+
+.recharts-cartesian-grid-vertical {
+  line:first-child {
+    stroke: rgb(230, 230, 230);
+  }
+
+  line {
+    stroke: transparent;
   }
 }

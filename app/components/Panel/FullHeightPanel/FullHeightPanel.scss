@@ -3,10 +3,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: auto;
-  max-height: 780px;
-  min-height: 780px;
+  margin: -24px auto;
   width: 680px;
+  min-height: 100vh;
 
   .childrenContainer {
     display: flex;
@@ -26,7 +25,7 @@
     align-items: center;
 
     .headerIcon {
-      margin-right: 5px;
+      margin-right: 10px;
       display: flex;
 
       svg {
@@ -84,6 +83,7 @@
     }
   }
 }
+
 .layoutContainer {
   height: 100%;
   width: 100%;
