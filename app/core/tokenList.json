@@ -1,4 +1,17 @@
 {
+  "LOCK": {
+    "symbol": "LOCK",
+    "companyName": "LOCK Token",
+    "type": "NEP5",
+    "networks": {
+      "1": {
+        "name": "LOCK Token",
+        "hash": "c36a622ad044df617634460a0f68e9023c0aa4aa",
+        "decimals": 8,
+        "totalSupply": 6250000000
+      }
+    }
+  },
   "ACAT": {
     "symbol": "ACAT",
     "companyName": "ACAT Token",

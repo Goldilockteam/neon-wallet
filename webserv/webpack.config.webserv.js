@@ -38,7 +38,7 @@ module.exports.plugins.unshift(
   new webpack.NormalModuleReplacementPlugin(
     // export const openExternal = (srcLink: string)
     /^\.\/electron$/,
-    path.join(__dirname, 'src', 'dot-electron.js')
+    path.join(__dirname, 'src', 'electron.js')
   ),
   new webpack.NormalModuleReplacementPlugin(
     // clipboard.writeText(text)

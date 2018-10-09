@@ -7,6 +7,15 @@ import {
   showInfoNotification
 } from '../../app/modules/notifications'
 
+export const openExternal = (srcLink: string) => {
+  console.log(`opening ${srcLink}`)
+  window.open(srcLink)
+}
+
+export const shell = {
+  openExternal: openExternal
+}
+
 // import { clipboard } from 'electron'
   // .writeText(text)
 
