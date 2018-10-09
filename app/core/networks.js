@@ -1,10 +1,9 @@
 // @flow
 import { /*MAIN_NETWORK_ID,*/ TEST_NETWORK_ID /*, COZ_TEST_NETWORK_ID, GOLDI_NETWORK_ID*/ } from './constants'
 
-/*
 export const isMainNetwork = (networkId: string) =>
-  networkId === MAIN_NETWORK_ID
-*/
+  // networkId === MAIN_NETWORK_ID
+  false
 export const isTestNetwork = (networkId: string) =>
   networkId === TEST_NETWORK_ID
 /*

@@ -160,12 +160,15 @@ wss.on('connection', (ws) => {
       // const cb = () => wsSend({ resId: msg.reqId, args: arguments })
       // msg.args.push(cb)
 
-      console.log(`request start: ${msg.fn} ${msg.id} ${msg.key}`)
 
       if(msg.fn == 'heartbeat') {
         await wsSend({ id: msg.id, data: ++msg.hbid })
+        return
       }
-      else if(msg.fn == 'authy-login-code') {
+
+      console.log(`request start: ${msg.fn} ${msg.id} ${msg.key}`)
+
+      if(msg.fn == 'authy-login-code') {
         // TODO ban the IP after 3 retries
         // generate authy code for identification purposes
         if(args.authyLoginEnabled === 'true') {

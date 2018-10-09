@@ -49,6 +49,10 @@ export const getExplorerAddressLink = (
   explorer: ExplorerType,
   address: string
 ) => {
+  // TMPFIX: hard-set to neo-scan bc default-setting
+  // doesn't seem to work yet
+  explorer = EXPLORERS.NEO_SCAN
+
   const baseURL = getExplorerBaseURL(networkId, explorer)
 
   if (explorer === EXPLORERS.NEO_TRACKER) {

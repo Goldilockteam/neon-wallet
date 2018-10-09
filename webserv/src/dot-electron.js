@@ -1,4 +1,5 @@
 
 export const openExternal = (srcLink: string) => {
-  // TODO simulate a web click with target=_new
+  console.log(`opening ${srcLink}`)
+  window.open(srcLink)
 }
