@@ -27,7 +27,7 @@ const DEFAULT_SETTINGS: () => Promise<Settings> = async () => ({
   theme: DEFAULT_THEME,
   blockExplorer: EXPLORERS.NEO_SCAN,
   tokens: await getDefaultTokens(),
-  version: pack
+  version: pack.version
 })
 
 const ensureHex = (token: string): boolean => {
