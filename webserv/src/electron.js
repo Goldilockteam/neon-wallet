@@ -21,7 +21,8 @@ export const shell = {
 
 export const clipboard = {
   writeText: (text) => {
-    new ClipboardAction({ text: text })
+    const ca = new ClipboardAction({ text: text, container: document.body })
+    ca.destroy()
   }
 }
 

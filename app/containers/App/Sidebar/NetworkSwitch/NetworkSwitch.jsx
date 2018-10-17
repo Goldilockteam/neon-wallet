@@ -2,66 +2,58 @@
 import React, { Component } from 'react'
 
 import classNames from 'classnames'
-import SelectInput from '../../../../components/Inputs/SelectInput'
+import StyledReactSelect from '../../../../components/Inputs/StyledReactSelect/StyledReactSelect'
 import { getNetworks } from '../../../../core/networks'
 import styles from './NetworkSwitch.scss'
 
 type Props = {
-  networkId: string,
   onChange: Function,
+  handleControlledChange: Function,
   className: string,
-  networks: Array<NetworkItemType>
+  disabled: boolean,
+  networks: Array<NetworkItemType>,
+  transparent: boolean,
+  shouldSwitchNetworks: boolean,
+  fontSize: number,
+  value: NetworkItemType
 }
 
 export default class NetworkSwitch extends Component<Props> {
   static defaultProps = {
-    networks: getNetworks()
+    networks: getNetworks(),
+    shouldSwitchNetworks: true
   }
 
   render() {
-    const { networkId, networks, className } = this.props
-
-    const items = networks.filter(network => network.id !== networkId)
+    const {
+      networks,
+      className,
+      disabled,
+      transparent,
+      fontSize,
+      value
+    } = this.props
 
     return (
       <div id="network" className={classNames(styles.networkSwitch, className)}>
-        <SelectInput
-          items={items}
+        <StyledReactSelect
+          fontSize={fontSize}
+          transparent={transparent}
+          hideHighlight
+          disabled={disabled}
+          value={value}
           onChange={this.handleChange}
-          renderItem={this.renderItem}
-          activeStyles={styles.networkSwitchActive}
-          textInputContainerClassName={styles.networkSwitchTextInputContainer}
-          textInputClassName={styles.networkSwitchTextInput}
-          value={this.getNetworkLabel()}
-          readOnly
-          customChangeEvent
+          options={networks}
+          isSearchable={false}
         />
       </div>
     )
   }
 
-  getNetworkLabel = () => {
-    const { networkId, networks } = this.props
-    const currentNetwork = networks.find(network => network.id === networkId)
-    if (currentNetwork) {
-      return currentNetwork.label
+  handleChange = (option: NetworkItemType) => {
+    if (this.props.shouldSwitchNetworks) {
+      return this.props.onChange(option.id)
     }
-    return ''
-  }
-
-  renderItem = (item: Object) => (
-    <div
-      key={item.id}
-      onClick={this.handleChange}
-      data-network={item.id}
-      aria-label={item.label}
-      className={styles.dropdownItem}
-    >
-      {item.label}
-    </div>
-  )
-
-  handleChange = (event: Object) => {
-    this.props.onChange(event.target.dataset.network)
+    this.props.handleControlledChange(option)
   }
 }

@@ -2,6 +2,7 @@
 import React from 'react'
 import NeoQR from 'neo-qrcode'
 
+import Loader from '../../Loader'
 import BaseModal from '../BaseModal'
 import styles from './style.scss'
 import GridIcon from '../../../assets/icons/grid.svg'
@@ -10,7 +11,6 @@ import { ASSETS, TOKENS } from '../../../core/constants'
 
 type Props = {
   hideModal: Function,
-  walletName: string,
   address: string,
   asset: string,
   amount: string,
@@ -18,25 +18,20 @@ type Props = {
 }
 
 type State = {
-  imgUri: string
+  imgUri: string,
+  loading: boolean
 }
 
 export default class ReceiveModal extends React.Component<Props, State> {
   image: ?HTMLImageElement
 
   state = {
-    imgUri: ''
+    imgUri: '',
+    loading: true
   }
 
   componentDidMount() {
-    const {
-      hideModal,
-      walletName,
-      address,
-      asset,
-      amount,
-      description
-    } = this.props
+    const { address, asset, amount, description } = this.props
 
     const qrCode = new NeoQR({
       nep9Data: {
@@ -49,22 +44,16 @@ export default class ReceiveModal extends React.Component<Props, State> {
 
     qrCode.toDataURL().then(imgData => {
       if (this.image) this.image.src = imgData
+      this.setState({ loading: false })
     })
 
     this.setState({ imgUri: qrCode.uri.replace('neo:', '') })
   }
 
   render() {
-    const {
-      hideModal,
-      walletName,
-      address,
-      asset,
-      amount,
-      description
-    } = this.props
+    const { hideModal, address, asset, amount, description } = this.props
 
-    const { imgUri } = this.state
+    const { imgUri, loading } = this.state
 
     const tokensList: Array<any> = Object.values(TOKENS)
 
@@ -75,12 +64,11 @@ export default class ReceiveModal extends React.Component<Props, State> {
             token.networks['1'].hash === asset ? token.symbol : accum,
           asset
         )
-
     return (
       <BaseModal
         title="Your QR Code"
         hideModal={hideModal}
-        style={{ content: { width: '775px', height: '830px' } }}
+        style={{ content: { width: '750px', height: '100%' } }}
       >
         <div className={styles.contentContainer}>
           <div className={styles.header}>
@@ -90,14 +78,13 @@ export default class ReceiveModal extends React.Component<Props, State> {
 
           <div className={styles.subHeader}>
             <div className={styles.title}>Receive assets</div>
-            <div className={styles.walletName}>{walletName}</div>
           </div>
 
           <div className={styles.section}>
             <div className={styles.sectionTitle}>PAYMENT REQUEST DETAILS</div>
             <div className={styles.sectionContent}>
               <div className={styles.assetAmount}>
-                {(amount ? `${amount} ` : '') + (assetSymbol || '')}
+                {(amount ? `${amount} ` : '') + (assetSymbol || 'NEO')}
               </div>
               <div className={styles.address}>{address}</div>
               <div className={styles.description}>
@@ -109,6 +96,7 @@ export default class ReceiveModal extends React.Component<Props, State> {
           <div className={styles.section}>
             <div className={styles.sectionTitle}>YOUR QR CODE</div>
             <div className={styles.qrcode}>
+              {loading && <Loader className={styles.loaderMargin} />}
               <img
                 ref={(el: ?HTMLImageElement) => {
                   this.image = el
@@ -122,8 +110,7 @@ export default class ReceiveModal extends React.Component<Props, State> {
             <div className={styles.sectionTitle}>IMAGE URL</div>
             <div className={styles.sectionContent}>
               <div className={styles.imgUri}>
-                <div>'https://nep9.o3.network/'</div>
-                <div>{imgUri}</div>
+                {`https://nep9.o3.network/${imgUri}`}
               </div>
               <CopyToClipboard text={`https://nep9.o3.network/${imgUri}`} />
             </div>

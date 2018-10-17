@@ -1,6 +1,6 @@
 @import '../../../styles/variables';
 
-$size: 64px;
+$size: 68px;
 
 .container {
   display: flex;
@@ -9,6 +9,7 @@ $size: 64px;
   box-sizing: border-box;
   width: $size;
   background: #fff;
+  padding-top: 12px;
 
   .group {
     flex: 0 0 auto;
@@ -65,8 +66,8 @@ $size: 64px;
 
   &.active,
   &:hover {
-    background: #fff;
-    border-color: #5abf6b;
+    background: #f2f2f2;
+    border-color: #66edcd;
 
     &,
     & svg,

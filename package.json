@@ -39,14 +39,19 @@
       "app/dist/style.css"
     ],
     "dmg": {
+      "background": "./app/assets/images/background.tiff",
+      "window": {
+        "width": 576,
+        "height": 382.5
+      },
       "contents": [
         {
-          "x": 110,
-          "y": 150
+          "x": 168,
+          "y": 200
         },
         {
-          "x": 240,
-          "y": 150,
+          "x": 408,
+          "y": 200,
           "type": "link",
           "path": "/Applications"
         }
@@ -82,6 +87,7 @@
     "fs": "^0.0.1-security",
     "global": "4.3.2",
     "history": "4.7.2",
+    "instascan": "^1.0.0",
     "isomorphic-fetch": "2.2.1",
     "lodash": "^4.17.11",
     "lodash-es": "^4.17.11",

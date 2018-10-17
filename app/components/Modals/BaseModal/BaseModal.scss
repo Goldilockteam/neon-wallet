@@ -19,12 +19,11 @@
   }
 }
 
-.modalHeaderCloseButton {
+.modalHeaderButton {
   width: 60px;
   height: 100%;
   position: absolute;
-  right: 0;
-  top: 0;
+
   cursor: pointer;
   background: transparent;
   border: none;
@@ -35,10 +34,21 @@
   }
 }
 
+.modalHeaderBackButton {
+  @extend .modalHeaderButton;
+  left: 0;
+  top: 0;
+}
+
+.modalHeaderCloseButton {
+  @extend .modalHeaderButton;
+  right: 0;
+  top: 0;
+}
+
 .modalBody {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  padding: 24px;
   overflow-y: auto;
 }

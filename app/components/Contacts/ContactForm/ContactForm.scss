@@ -60,10 +60,17 @@
 
     .dialogueAndButtonContainer {
       margin-top: -20px;
+
+      svg {
+        path {
+          fill: #ee6d66;
+        }
+      }
     }
   }
 
   .submitButton {
     margin-top: auto;
+    margin-bottom: 50px;
   }
 }
