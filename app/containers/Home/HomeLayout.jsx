@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import classNames from 'classnames'
 
 import styles from './Home.scss'
-import logo from '../../assets/images/logo.png'
+import logo from '../../assets/images/goldilock-icon.png'
 
 type Props = {
   children: React$Node,

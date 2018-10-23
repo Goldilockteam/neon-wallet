@@ -1,3 +1,5 @@
+@import '../../../styles/variables';
+
 $encrypt-icon-size: 24px;
 
 .encryptSuccess {
@@ -30,7 +32,7 @@ $encrypt-icon-size: 24px;
     justify-content: space-between;
     height: 50px;
     padding: 0 24px 0 0;
-    background: #f2f2f2;
+    background: $secondary-background;
     border-radius: 4px;
 
     input {

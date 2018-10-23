@@ -1,3 +1,5 @@
+@import '../../styles/variables';
+
 $panel-top-margin: 25px;
 
 .settingsContainer {
@@ -24,7 +26,7 @@ $panel-top-margin: 25px;
         flex: auto;
 
         &:first-child {
-          color: #282828;
+          color: $default-text;
         }
 
         &:last-child {
@@ -43,7 +45,7 @@ $panel-top-margin: 25px;
 
     .settingsDonations {
       font-size: 12px;
-      color: #282828;
+      color: $default-text;
       padding-top: 10px;
       text-align: center;
       justify-content: center;

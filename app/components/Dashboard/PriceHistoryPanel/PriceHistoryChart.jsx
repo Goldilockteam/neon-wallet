@@ -89,7 +89,7 @@ export default class PriceHistoryChart extends React.Component<Props, State> {
           <Line
             dataKey={priceKey}
             type="monotone"
-            stroke="#66ED87"
+            stroke="rgb(241, 185, 72)"
             strokeWidth={4}
             dot={false}
             animationDuration={500}
@@ -111,7 +111,7 @@ export default class PriceHistoryChart extends React.Component<Props, State> {
         y={0}
         textAnchor="middle"
         alignmentBaseline="hanging"
-        fill="#282828"
+        fill="#DDD"
       >
         {this.formatPrice(staticPrice, formatFiat)}
       </text>
@@ -139,7 +139,7 @@ export default class PriceHistoryChart extends React.Component<Props, State> {
           y={35}
           textAnchor="middle"
           alignmentBaseline="hanging"
-          fill="#282828"
+          fill="#DDD"
         >
           {change >= 0 && '+'}
           {(change * 100).toFixed(2)}%

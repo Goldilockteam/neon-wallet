@@ -195,7 +195,7 @@ export default class Settings extends Component<Props, State> {
             <SettingsItem title="THEME">
               <div className={styles.settingsSelectContainer}>
                 <StyledReactSelect
-                  isDisabled
+                  // isDisabled
                   value={this.state.selectedTheme}
                 />
               </div>

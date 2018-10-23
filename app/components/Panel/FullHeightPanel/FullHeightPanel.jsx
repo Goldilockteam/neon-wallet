@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 import classNames from 'classnames'
 
-import greyLogo from '../../../assets/images/grey-logo.png'
+import greyLogo from '../../../assets/images/goldilock-logo.png'
 
 import styles from './FullHeightPanel.scss'
 

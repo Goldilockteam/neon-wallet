@@ -1,4 +1,5 @@
 @import '../../../styles/animations';
+@import '../../../styles/variables';
 
 .headerStyle {
   height: auto !important;
@@ -37,7 +38,7 @@
 
   .tableData {
     min-height: 35px;
-    border-bottom: solid thin #f2f2f2;
+    border-bottom: solid thin $secondary-background;
     padding: 5px 0px 2px 2px;
     margin-left: -24px;
     margin-right: -24px;
@@ -98,7 +99,7 @@
       flex: 1 1 auto;
       margin-right: 20px;
       font-weight: 400;
-      color: #5c677f;
+      color: $dark-grey;
       min-width: 165px;
       width: 25%;
     }
@@ -132,7 +133,7 @@
   }
 
   .tableData {
-    color: #282828;
+    color: $default-text;
     align-items: center;
   }
 
@@ -148,7 +149,7 @@
 }
 
 .oddNumberedRow {
-  background-color: #f2f2f2;
+  background-color: $secondary-background;
 }
 
 .emptyBalanceContainer {

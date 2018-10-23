@@ -126,7 +126,7 @@ export const DEFAULT_WALLET = {
 
 export const DEFAULT_CURRENCY_CODE = 'usd'
 
-export const DEFAULT_THEME = 'Light'
+export const DEFAULT_THEME = 'Dark'
 
 export const CURRENCIES = {
   aud: { symbol: '$' },

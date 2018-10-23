@@ -1,4 +1,4 @@
 export default {
-  '--main-background': '#000'
+  '--main-background': '#26425b'
   // more dark colors here
 }

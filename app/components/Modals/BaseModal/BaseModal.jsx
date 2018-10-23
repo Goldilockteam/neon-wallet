@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import ReactModal from 'react-modal'
 import Close from 'react-icons/lib/md/close'
 
-import Logo from '../../../assets/images/grey-logo.png'
+import Logo from '../../../assets/images/goldilock-logo.png'
 
 import styles from './BaseModal.scss'
 

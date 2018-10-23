@@ -1,3 +1,5 @@
+@import '../../styles/variables.scss';
+
 $success-icon-size: 140px;
 
 .successMessage {
@@ -23,7 +25,7 @@ $success-icon-size: 140px;
 
 .text {
   display: flex;
-  color: #5c677f;
+  color: $dark-grey;
   font-weight: 200;
   text-transform: uppercase;
   font-size: 29px;

@@ -1,5 +1,7 @@
+@import '../../../styles/variables';
+
 .walletPanel {
-  background: #f2f2f2;
+  background: $secondary-background;
   border-radius: 4px;
   margin: 20px 0;
 
@@ -17,14 +19,14 @@
     padding: 0 80px;
 
     .walletPanelButton {
-      background: #f2f2f2;
+      background: $secondary-background;
       &:not([disabled]) {
         &:hover {
           background: initial;
-          color: #282828;
+          color: $default-text;
 
           path {
-            fill: #282828;
+            fill: $default-text;
           }
         }
       }

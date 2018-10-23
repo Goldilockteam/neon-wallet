@@ -3,10 +3,7 @@ import Select from 'react-select'
 
 const customStyles = {
   option: (styles, { data, isDisabled, isFocused, isSelected }) => ({
-    ...styles,
-    '&:active': {
-      backgroundColor: '#e6e6e6'
-    }
+    ...styles
   }),
   noOptionsMessage: styles => ({
     ...styles,

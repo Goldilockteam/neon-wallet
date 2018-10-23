@@ -55,7 +55,7 @@ $navigation-margin: 20px;
 }
 
 .innerHomeContainer {
-  background-color: #fff;
+  background-color: $third-background;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -159,7 +159,7 @@ $navigation-margin: 20px;
   line-height: 32px;
   font-family: Gotham-Light;
   font-size: 30px;
-  color: #394152;
+  color: #8d98ae;
 }
 
 .logo {

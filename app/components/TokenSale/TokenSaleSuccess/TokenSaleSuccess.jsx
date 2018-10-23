@@ -9,7 +9,7 @@ import SendIcon from '../../../assets/icons/send.svg'
 import ConfirmCircle from '../../../assets/icons/confirm-circle.svg'
 import { createFormattedDate } from '../../../util/createFormattedDate'
 
-import Logo from '../../../assets/images/grey-logo.png'
+import Logo from '../../../assets/images/goldilock-logo.png'
 import styles from './TokenSaleSuccess.scss'
 
 type Props = {

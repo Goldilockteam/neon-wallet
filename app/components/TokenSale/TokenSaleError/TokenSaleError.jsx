@@ -10,7 +10,7 @@ import TokenSaleIcon from '../../../assets/navigation/tokens.svg'
 import TokenSaleErrorDetails from './TokenSaleErrorDetails/TokenSaleErrorDetails'
 
 import styles from './TokenSaleError.scss'
-import Logo from '../../../assets/images/grey-logo.png'
+import Logo from '../../../assets/images/goldilock-logo.png'
 
 type Props = {
   retryHandler: () => void,

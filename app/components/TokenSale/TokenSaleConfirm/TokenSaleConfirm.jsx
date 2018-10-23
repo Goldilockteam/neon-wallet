@@ -8,7 +8,7 @@ import Button from '../../Button'
 import TokenSaleIcon from '../../../assets/navigation/tokens.svg'
 
 import styles from './TokenSaleConfirm.scss'
-import Logo from '../../../assets/images/grey-logo.png'
+import Logo from '../../../assets/images/goldilock-logo.png'
 
 type Props = {
   onClickHandler: () => void,

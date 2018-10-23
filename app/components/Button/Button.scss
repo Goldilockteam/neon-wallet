@@ -1,9 +1,8 @@
 @import '../../styles/variables';
 
 .active {
-  background-image: linear-gradient(to right, #66eb8e, #6bdaf6),
-    radial-gradient(circle at top left, #66eb8e, #6bdaf6) !important;
   color: #fff !important;
+  @include active-input;
 }
 
 .button {
@@ -27,8 +26,7 @@
     cursor: pointer;
 
     &:hover {
-      background-image: linear-gradient(to right, #66eb8e, #6bdaf6),
-        radial-gradient(circle at top left, #66eb8e, #6bdaf6);
+      @include active-input;
     }
   }
 
@@ -45,7 +43,7 @@
     border: solid;
     border-width: 2px;
     border-color: transparent;
-    background: #fff;
+    background: $main-background;
     color: $primary-button;
 
     &:not([disabled]):hover {

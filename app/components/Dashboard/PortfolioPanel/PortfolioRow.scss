@@ -1,3 +1,5 @@
+@import '../../../styles/variables';
+
 .portfolioRow {
   display: flex;
   flex-direction: row;
@@ -13,7 +15,7 @@
   .percent {
     font-size: 14px;
     font-weight: 100;
-    color: #394152;
+    color: #8d98ae;
     overflow: hidden;
     text-overflow: ellipsis;
     width: 20%;
@@ -35,5 +37,5 @@
 }
 
 .oddColor {
-  background-color: #f2f2f2;
+  background-color: $secondary-background;
 }

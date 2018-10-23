@@ -28,7 +28,7 @@ const overrideStyles = {
 
     success: {
       backgroundColor: '#2E463D',
-      color: '#66ED87'
+      color: 'rgb(241, 185, 72)'
     },
     error: {
       backgroundColor: '#EE6D66'

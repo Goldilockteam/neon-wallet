@@ -16,7 +16,7 @@ import TokenSaleIcon from '../../../assets/navigation/tokens.svg'
 import SettingsIcon from '../../../assets/navigation/settings.svg'
 import { ROUTES } from '../../../core/constants'
 
-import LogoWithoutText from '../../../assets/images/logo-without-text.png'
+import Logo from '../../../assets/images/goldilock-icon.png'
 
 type Props = {
   className: string,
@@ -27,7 +27,7 @@ const Sidebar = ({ className, showTokenSaleModal }: Props) => (
   <div className={classNames(styles.container, className)}>
     <div className={styles.group}>
       <div className={styles.logo}>
-        <img src={LogoWithoutText} alt="neon-logo" />
+        <img src={Logo} alt="neon-logo" />
       </div>
 
       <NavLink

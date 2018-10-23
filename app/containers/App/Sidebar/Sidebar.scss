@@ -8,7 +8,7 @@ $size: 64px;
   justify-content: space-between;
   box-sizing: border-box;
   width: $size;
-  background: #f2f2f2;
+  background: $secondary-background;
 
   .group {
     flex: 0 0 auto;
@@ -61,6 +61,7 @@ $size: 64px;
     font-family: Gotham-Book;
     font-size: 10px;
     margin-top: 5px;
+    text-align: center;
   }
 
   &,
@@ -72,13 +73,14 @@ $size: 64px;
 
   &.active,
   &:hover {
-    background: #fff;
-    border-image: linear-gradient(to bottom, #66eb8e, #6bdaf6) 1 100%;
+    background: rgba(0, 0, 0, 0.1);
+    border-image: linear-gradient(to bottom, $primary-button, $primary-button) 1
+      100%;
 
     &,
     & svg,
     & svg path {
-      color: #394152;
+      color: #8d98ae;
     }
   }
 }

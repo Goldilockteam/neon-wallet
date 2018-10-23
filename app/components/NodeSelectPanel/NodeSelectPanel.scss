@@ -30,7 +30,7 @@ $icon-size: 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #f2f2f2;
+    background-color: $secondary-background;
     padding: 25px;
     min-height: 12px;
 
@@ -39,7 +39,7 @@ $icon-size: 24px;
     .automaticSelect {
       font-size: 14px;
       line-height: 14px;
-      color: #5c677f;
+      color: $dark-grey;
       font-family: Gotham-Book;
     }
 
@@ -57,7 +57,7 @@ $icon-size: 24px;
 
     .automaticSelect {
       svg path {
-        fill: #66ed87;
+        fill: $orange-color;
       }
     }
 
@@ -148,7 +148,7 @@ $icon-size: 24px;
 
         svg,
         svg path {
-          fill: #66ed87;
+          fill: $orange-color;
         }
       }
     }

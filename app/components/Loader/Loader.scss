@@ -10,8 +10,7 @@
   text-align: center;
   font-size: 10px;
   > div {
-    background-image: linear-gradient(to right, #66eb8e, #6bdaf6),
-      radial-gradient(circle at top left, #66eb8e, #6bdaf6);
+    background-color: $primary-color;
     height: 100%;
     width: 6px;
     display: inline-block;
