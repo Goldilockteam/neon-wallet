@@ -12,8 +12,7 @@ import {
   TEST_NETWORK_ID//,
   // GOLDI_NETWORK_ID
 } from './constants'
-
-let fetchedTokens
+import { imageMap } from '../assets/nep5/png'
 
 export const adjustDecimalAmountForTokenTransfer = (value: string): string =>
   toBigNumber(value)
@@ -27,7 +26,6 @@ const getTokenEntry = ((): Function => {
     symbol: string,
     scriptHash: string,
     networkId: string,
-    image: string,
     name: string,
     decimals: number
   ) => ({
@@ -36,7 +34,7 @@ const getTokenEntry = ((): Function => {
     scriptHash,
     networkId,
     isUserGenerated: false,
-    image,
+    image: imageMap[symbol],
     name,
     decimals
   })
@@ -45,32 +43,13 @@ const getTokenEntry = ((): Function => {
 export const getDefaultTokens = async (): Promise<Array<TokenItemType>> => {
   const tokens = []
   /*
-  // Prevent duplicate requests here
-  if (!fetchedTokens) {
-    const response = await axios
-      // use a time stamp query param to prevent caching
-      .get(
-        `https://raw.githubusercontent.com/CityOfZion/neo-tokens/master/tokenList.json?timestamp=${new Date().getTime()}`
-      )
-      .catch(error => {
-        console.error('Falling back to hardcoded list of NEP5 tokens!', error)
-        // if request to gh fails use hardcoded list
-        fetchedTokens = TOKENS
-      })
-    if (response && response.data && !isEmpty(response.data)) {
-      fetchedTokens = response.data
-    } else {
-      fetchedTokens = TOKENS
-    }
-  }
-
   tokens.push(
-    ...map(fetchedTokens, tokenData =>
+    ...map(TOKENS, tokenData =>
       getTokenEntry(
         tokenData.symbol,
         tokenData.networks['1'].hash,
         MAIN_NETWORK_ID,
-        tokenData.image,
+
         tokenData.networks['1'].name,
         tokenData.networks['1'].decimals
       )

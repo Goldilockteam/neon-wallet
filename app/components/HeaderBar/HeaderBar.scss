@@ -21,9 +21,15 @@
     font-weight: 300;
   }
 
+  svg {
+    path {
+      fill: var(--header-bar-default-icon-color);
+    }
+  }
+
   a {
     text-decoration: none;
-    color: black;
+    color: var(--base-text);
     align-items: center;
     display: flex;
   }
@@ -41,4 +47,11 @@
   .loading {
     animation: spin 1.5s linear infinite;
   }
+}
+
+.currentNetwork {
+  text-align: left;
+  font-size: 10px;
+  margin: -12px 0 0 12px;
+  opacity: 0.5;
 }

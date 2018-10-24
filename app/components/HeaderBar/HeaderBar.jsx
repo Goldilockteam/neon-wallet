@@ -1,19 +1,18 @@
 // @flow
 import React from 'react'
-import classNames from 'classnames'
-import { omit } from 'lodash-es'
 
-import RefreshIcon from '../../assets/icons/refresh.svg'
+import RefreshButton from '../../containers/Buttons/RefreshButton'
+import { isMainNetwork } from '../../core/networks'
 
 import styles from './HeaderBar.scss'
 
 type Props = {
   label: string,
-  shouldRenderRefresh: boolean,
+  shouldRenderRefresh?: boolean,
   renderLeftContent?: () => any,
   renderRightContent?: () => any,
-  loadWalletData?: Function,
-  loading?: boolean
+  networkId: string,
+  net: string
 }
 
 export default class HeaderBar extends React.PureComponent<Props> {
@@ -27,28 +26,20 @@ export default class HeaderBar extends React.PureComponent<Props> {
       shouldRenderRefresh = false,
       renderLeftContent = () => null,
       renderRightContent = () => null,
-      loadWalletData,
-      loading
+      networkId,
+      net
     } = this.props
 
     return (
-      <div className={styles.headerBar}>
-        {label ? <h3> {label}</h3> : renderLeftContent()}
-        {shouldRenderRefresh ? (
-          <div className={styles.refreshButton}>
-            <RefreshIcon
-              id="refresh"
-              className={classNames(styles.refresh, {
-                [styles.loading]: loading
-              })}
-              onClick={loading ? null : loadWalletData}
-            />
-            <span onClick={loading ? null : loadWalletData}> Refresh </span>
-          </div>
-        ) : (
-          renderRightContent()
+      <React.Fragment>
+        {!isMainNetwork(networkId) && (
+          <div className={styles.currentNetwork}>{net}</div>
         )}
-      </div>
+        <div className={styles.headerBar}>
+          {label ? <h3> {label}</h3> : renderLeftContent()}
+          {shouldRenderRefresh ? <RefreshButton /> : renderRightContent()}
+        </div>
+      </React.Fragment>
     )
   }
 }

@@ -4,3 +4,4 @@
 /deploy/tmp
 /deploy/www/test.js
 /local.conf
+/deploy/www/*.svg

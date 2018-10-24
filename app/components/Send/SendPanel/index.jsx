@@ -35,12 +35,14 @@ type Props = {
   handleSubmit: () => any,
   handleSend: () => any,
   clearErrors: (index: number, field: string) => any,
-  addRow: (row: Object) => any,
+  addRow: (row?: Object) => any,
   removeRow: (index: number) => any,
   updateRowField: (index: number, field: string, value: any) => any,
   handleEditRecipientsClick: () => any,
   showSendModal: (props: Object) => any,
-  pushQRCodeData: (data: Object) => any
+  pushQRCodeData: (data: Object) => any,
+  isConfirmSendDisabled: () => any,
+  disableConfirmSend: () => any
 }
 
 const SendPanel = ({
@@ -67,7 +69,9 @@ const SendPanel = ({
   address,
   maxNumberOfRecipients,
   showSendModal,
-  pushQRCodeData
+  pushQRCodeData,
+  isConfirmSendDisabled,
+  disableConfirmSend
 }: Props) => {
   const shouldDisableSendButton = sendRowDetails => {
     let disabled = false
@@ -86,6 +90,8 @@ const SendPanel = ({
   }
 
   const maxRecipientsMet = () => sendRowDetails.length === maxNumberOfRecipients
+
+  let confirmSendDisabled = true
 
   if (noSendableAssets) {
     return <ZeroAssets address={address} />
@@ -140,6 +146,9 @@ const SendPanel = ({
         <ConfirmSend
           handleEditRecipientsClick={handleEditRecipientsClick}
           fees={fees}
+          isConfirmSendDisabled={isConfirmSendDisabled}
+          disableConfirmSend={disableConfirmSend}
+          handleSend={handleSend}
         />
       </form>
     )

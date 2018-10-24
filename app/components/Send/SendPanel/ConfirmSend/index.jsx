@@ -16,7 +16,7 @@ type Props = {
   fees: number
 }
 
-const ConfirmSend = ({ handleEditRecipientsClick, fees }: Props) => (
+const ConfirmSend = ({ handleEditRecipientsClick, fees, isConfirmSendDisabled, disableConfirmSend, handleSend }: Props) => (
   <section>
     <DialogueBox
       icon={<WarningIcon />}
@@ -26,6 +26,7 @@ const ConfirmSend = ({ handleEditRecipientsClick, fees }: Props) => (
       <Button
         className={styles.confirmSendButtons}
         renderIcon={() => <ErrorIcon />}
+        disabled={isConfirmSendDisabled()}
         onClick={handleEditRecipientsClick}
       >
         Edit Recipients
@@ -36,6 +37,11 @@ const ConfirmSend = ({ handleEditRecipientsClick, fees }: Props) => (
           primary
           className={styles.confirmSendButtons}
           renderIcon={() => <CheckMarkIcon />}
+          disabled={isConfirmSendDisabled()}
+          onClick={(e) => {
+            disableConfirmSend()
+            handleSend(e)
+          }}
           type="submit"
         >
           Confirm & Send

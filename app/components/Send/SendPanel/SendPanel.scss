@@ -13,7 +13,7 @@
 
   .sendPanelHeaderInfo,
   .sendPanelRecipients {
-    color: $dark-grey;
+    color: var(--panel-header-text);
   }
 
   .sendPanelRecipients {
@@ -47,7 +47,9 @@
     display: flex;
     margin-right: 10px;
     align-items: center;
+    width: 170px;
     font-size: 1rem;
+    color: var(--base-text);
     align-items: center;
     cursor: pointer;
 
@@ -57,7 +59,7 @@
     }
 
     .sendPanelHeaderButtonIcon {
-      color: $dark-grey;
+      color: var(--panel-header-text);
       margin-right: 10px;
     }
     svg {
@@ -112,7 +114,7 @@
 
 .sendFormButton {
   width: 450px;
-  margin: 10px auto 50px auto;
+  margin: 12px auto 50px auto;
 }
 
 .confirmButtonsContainer {

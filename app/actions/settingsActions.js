@@ -1,5 +1,5 @@
 // @flow
-import { pick, keys, uniqBy } from 'lodash-es'
+import { pick, keys, uniqBy, cloneDeep } from 'lodash-es'
 import { createActions } from 'spunky'
 
 import { getStorage, setStorage } from '../core/storage'
@@ -11,7 +11,7 @@ import {
   DEFAULT_CURRENCY_CODE,
   DEFAULT_THEME
 } from '../core/constants'
-import pack from '../../package.json'
+import { version } from '../../package.json'
 
 type Settings = {
   currency: string,
@@ -28,7 +28,7 @@ const DEFAULT_SETTINGS: () => Promise<Settings> = async () => ({
   theme: DEFAULT_THEME,
   blockExplorer: EXPLORERS.NEO_SCAN,
   tokens: await getDefaultTokens(),
-  version: pack.version
+  version
 })
 
 const getSettings = async (): Promise<Settings> => {
@@ -62,8 +62,14 @@ export const updateSettingsActions = createActions(
       ...settings,
       ...values
     }
-    await setStorage(STORAGE_KEY, newSettings)
-
+    const parsedForLocalStorage = cloneDeep(newSettings)
+    const tokensForStorage = [
+      ...newSettings.tokens.filter(token => token.isUserGenerated)
+    ]
+    // NOTE: we only save user generated tokens to local storage to avoid
+    // conflicts in managing the "master" nep5 list
+    parsedForLocalStorage.tokens = tokensForStorage
+    await setStorage(STORAGE_KEY, parsedForLocalStorage)
     return newSettings
   }
 )

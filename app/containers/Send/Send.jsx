@@ -10,6 +10,7 @@ import {
 } from '../../core/math'
 
 import { isBlacklisted } from '../../core/wallet'
+import { PRICE_UNAVAILABLE } from '../../core/constants'
 
 import AmountsPanel from '../../components/AmountsPanel'
 import SendPanel from '../../components/Send/SendPanel'
@@ -111,46 +112,32 @@ export default class Send extends React.Component<Props, State> {
     return {}
   }
 
+  // TODO: Move this logic to AmountsPanel / Centralized place
   createSendAmountsData = () => {
     const { sendableAssets, prices } = this.props
-    const { showConfirmSend, sendSuccess, sendRowDetails } = this.state
 
-    let assets = Object.keys(sendableAssets)
+    const assets = Object.keys(sendableAssets)
 
-    if (showConfirmSend || sendSuccess) {
-      assets = (assets.filter((asset: string) =>
-        sendRowDetails
-          .reduce(
-            (accumulator: Array<*>, row: Object) =>
-              accumulator.concat(row.asset),
-            []
-          )
-          .includes(asset)
-      ): Array<*>)
-    }
+    return (assets.map((asset: string) => {
+      const { balance } = sendableAssets[asset]
+      const currentBalance = minusNumber(
+        balance,
+        this.calculateRowAmounts(asset)
+      )
+      const price = prices[asset]
 
-    return (assets
-      .filter((asset: string) => !!prices[asset])
-      .map((asset: string) => {
-        const { balance } = sendableAssets[asset]
-        const currentBalance = minusNumber(
-          balance,
-          this.calculateRowAmounts(asset)
-        )
-        const price = prices[asset]
+      const totalBalanceWorth = price
+        ? multiplyNumber(balance, price)
+        : PRICE_UNAVAILABLE
 
-        const totalBalanceWorth = multiplyNumber(balance, price)
-        const remainingBalanceWorth = multiplyNumber(currentBalance, price)
-
-        return {
-          symbol: asset,
-          totalBalance: balance,
-          price,
-          currentBalance,
-          totalBalanceWorth,
-          remainingBalanceWorth
-        }
-      }): Array<*>)
+      return {
+        symbol: asset,
+        totalBalance: balance,
+        price,
+        currentBalance,
+        totalBalanceWorth
+      }
+    }): Array<*>)
   }
 
   removeRow = (index: number) => {
@@ -164,7 +151,7 @@ export default class Send extends React.Component<Props, State> {
     })
   }
 
-  addRow = (row: Object) => {
+  addRow = (row?: Object) => {
     this.setState((prevState: Object) => {
       const newState = [...prevState.sendRowDetails]
 
@@ -283,6 +270,9 @@ export default class Send extends React.Component<Props, State> {
   }
 
   handleEditRecipientsClick = () => this.setState({ showConfirmSend: false })
+
+  isConfirmSendDisabled = () => !!this.state.disableConfirmSend
+  disableConfirmSend = () => this.setState( { disableConfirmSend: true })
 
   handleAddPriorityFee = (fees: number) => this.setState({ fees })
 
@@ -429,6 +419,8 @@ export default class Send extends React.Component<Props, State> {
           resetViews={this.resetViews}
           showSendModal={showSendModal}
           pushQRCodeData={this.pushQRCodeData}
+          isConfirmSendDisabled={this.isConfirmSendDisabled}
+          disableConfirmSend={this.disableConfirmSend}
         />
       </section>
     )

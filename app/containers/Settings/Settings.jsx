@@ -11,6 +11,7 @@ import StyledReactSelect from '../../components/Inputs/StyledReactSelect/StyledR
 import HeaderBar from '../../components/HeaderBar'
 import SettingsItem from '../../components/Settings/SettingsItem'
 import SettingsLink from '../../components/Settings/SettingsLink'
+import NetworkSwitch from '../App/Sidebar/NetworkSwitch'
 
 import {
   EXPLORERS,
@@ -18,11 +19,10 @@ import {
   ROUTES,
   MODAL_TYPES,
   COZ_DONATIONS_ADDRESS,
-  DISCORD_INVITE_LINK
+  DISCORD_INVITE_LINK,
+  THEMES
 } from '../../core/constants'
-import themes from '../../themes'
 import styles from './Settings.scss'
-import Tooltip from '../../components/Tooltip'
 import AddIcon from '../../assets/icons/add.svg'
 import LockIcon from '../../assets/icons/lock.svg'
 import CurrencyIcon from '../../assets/icons/currency-icon.svg'
@@ -32,6 +32,7 @@ import CogIcon from '../../assets/icons/cog-icon.svg'
 import NodeSelectIcon from '../../assets/icons/node-select.svg'
 import TimeIcon from '../../assets/icons/time-icon.svg'
 import SaveIcon from '../../assets/icons/save-icon.svg'
+import pack from '../../../package.json'
 
 const { dialog, shell } = require('electron').remote
 
@@ -46,10 +47,8 @@ type Props = {
   showSuccessNotification: Object => any,
   showErrorNotification: Object => any,
   showModal: Function,
-  networks: Array<NetworkItemType>,
-  networkId: string,
-  handleNetworkChange: Function,
-  selectedNode: string
+  selectedNode: string,
+  net: string
 }
 
 type SelectOption = {
@@ -58,7 +57,6 @@ type SelectOption = {
 }
 
 type State = {
-  selectedNetwork: NetworkItemType,
   selectedCurrency: SelectOption,
   selectedTheme: SelectOption,
   selectedExplorer: SelectOption
@@ -77,11 +75,7 @@ export default class Settings extends Component<Props, State> {
     selectedExplorer: {
       value: this.props.explorer,
       label: EXPLORERS[this.props.explorer] || EXPLORERS.NEO_SCAN
-    },
-    selectedNetwork:
-      this.props.networks.find(
-        network => network.id === this.props.networkId
-      ) || this.props.networks[0]
+    }
   }
 
   saveWalletRecovery = () => {
@@ -178,6 +172,7 @@ export default class Settings extends Component<Props, State> {
   }
 
   updateThemeSettings = (option: SelectOption) => {
+    this.setState({ selectedTheme: option })
     const { setTheme } = this.props
     setTheme(option.value)
   }
@@ -195,6 +190,10 @@ export default class Settings extends Component<Props, State> {
       value: key,
       label: EXPLORERS[key]
     }))
+    const parsedThemeOptions = Object.keys(THEMES).map(key => ({
+      value: THEMES[key],
+      label: THEMES[key]
+    }))
 
     return (
       <section className={styles.settingsContainer}>
@@ -205,20 +204,15 @@ export default class Settings extends Component<Props, State> {
         <Panel
           className={styles.settingsPanel}
           renderHeader={this.renderHeader}
+          contentClassName={styles.panelContent}
         >
           <section className={styles.settingsItemsContainer}>
             <SettingsItem renderIcon={() => <CogIcon />} title="NETWORK">
               <div className={styles.settingsSelectContainer}>
-                <StyledReactSelect
-                  settingsSelect
-                  options={this.props.networks}
+                <NetworkSwitch
                   transparent
-                  value={this.state.selectedNetwork}
-                  onChange={selectedNetwork =>
-                    this.setState({ selectedNetwork }, () =>
-                      this.props.handleNetworkChange(selectedNetwork.id)
-                    )
-                  }
+                  value={{ label: this.props.net }}
+                  settingsSelect
                 />
               </div>
             </SettingsItem>
@@ -233,6 +227,7 @@ export default class Settings extends Component<Props, State> {
                   options={parsedExplorerOptions}
                   value={this.state.selectedExplorer}
                   onChange={this.updateExplorerSettings}
+                  isSearchable={false}
                 />
               </div>
             </SettingsItem>
@@ -253,18 +248,16 @@ export default class Settings extends Component<Props, State> {
               noBorderBottom
               title="THEME"
             >
-              <Tooltip
-                className={styles.settingsSelectContainer}
-                title="Coming Soon"
-                position="bottom"
-              >
+              <div className={styles.settingsSelectContainer}>
                 <StyledReactSelect
                   settingsSelect
-                  isDisabled
+                  onChange={this.updateThemeSettings}
+                  isSearchable={false}
                   transparent
+                  options={parsedThemeOptions}
                   value={this.state.selectedTheme}
                 />
-              </Tooltip>
+              </div>
             </SettingsItem>
             {/*
             <div className={styles.settingsSpacer} />
@@ -333,7 +326,7 @@ export default class Settings extends Component<Props, State> {
   renderHeader = () => (
     <div className={styles.settingsPanelHeader}>
       <div className={styles.settingsPanelHeaderItem}>
-        Manage your neon wallet
+        Manage your neon wallet - v{pack.version}
       </div>
       <div className={styles.settingsPanelHeaderItem}>
         Community Support:{' '}

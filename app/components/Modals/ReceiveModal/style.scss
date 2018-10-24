@@ -2,6 +2,13 @@
 
 .contentContainer {
   padding: 0 100px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.modalBody {
+  height: 100%;
 }
 
 .header {
@@ -26,9 +33,15 @@
     font-size: 30px;
     line-height: 32px;
     font-family: Gotham-Light;
-    color: #394152;
+    color: var(--base-text);
     text-align: center;
   }
+}
+
+.qr {
+  border: none;
+  height: 250px;
+  width: 250px;
 }
 
 .subHeader {
@@ -42,8 +55,17 @@
   }
 }
 
+.hidden {
+  opacity: 0;
+}
+
 .loaderMargin {
-  margin-top: 50px;
+  margin-top: 100px;
+}
+
+.buttonContainer {
+  margin-top: auto;
+  margin-bottom: 50px;
 }
 
 .urlSection,
@@ -64,14 +86,16 @@
 
   .sectionContent {
     padding: 16px;
-    background-color: $light-grey;
+    background-color: var(--panel-header);
   }
 
   .qrcode {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 200px;
+    min-height: 275px;
+    background-color: var(--panel-header);
+    padding: 16px;
   }
 
   .imgUri {

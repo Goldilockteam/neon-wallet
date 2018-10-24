@@ -1,3 +1,5 @@
+@import '../../../styles/variables';
+
 .tokenSalePanelDialogueBox {
   border: none;
   margin: 20px auto;
@@ -5,20 +7,30 @@
 
 .tokenSalePanelContainer {
   max-width: 600px;
-  margin: 20px auto;
+  margin: 0px auto;
 }
 
 .tokenSaleButton {
-  max-width: 400px;
-  margin: 20px auto;
+  max-width: 450px;
+  margin: 12px auto;
 }
 
 .tokenSalePanel {
   margin-bottom: 75px;
 }
 
+.tokenSalePanelHeaderContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
 .warningIcon {
   path {
-    fill: #ee6d66;
+    fill: $warning-red;
   }
+}
+
+.priorityFeeContainer {
+  margin: auto;
+  max-width: 450px;
 }
