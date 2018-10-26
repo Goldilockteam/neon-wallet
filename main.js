@@ -41,9 +41,12 @@ app.on('ready', () => {
       titleBarStyle: 'hidden',
       show: false,
       icon: path.join(__dirname, 'icons/png/64x64.png'),
+      contextIsolation: true,
       webPreferences: {
         allowRunningInsecureContent: false,
-        webSecurity: true
+        webSecurity: true,
+        nodeIntegration: false,
+        preload: path.join(__dirname, 'preload.js')
       }
     })
 

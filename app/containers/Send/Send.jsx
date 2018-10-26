@@ -1,6 +1,6 @@
 // @flow
 import React from 'react'
-import { uniqueId } from 'lodash-es'
+import { uniqueId, get } from 'lodash-es'
 import { wallet } from 'neon-js'
 import {
   toNumber,
@@ -109,7 +109,9 @@ export default class Send extends React.Component<Props, State> {
         errors: {}
       }
     }
-    return {}
+    return {
+      errors: {}
+    }
   }
 
   // TODO: Move this logic to AmountsPanel / Centralized place
@@ -256,7 +258,7 @@ export default class Send extends React.Component<Props, State> {
 
     const entries = sendRowDetails.map((row: Object) => ({
       address: row.address,
-      amount: toNumber(row.amount),
+      amount: toNumber(row.amount.toString().replace(/,/g, '')),
       symbol: row.asset
     }))
 
@@ -326,7 +328,6 @@ export default class Send extends React.Component<Props, State> {
   }
 
   validateAddress = async (formAddress: string, index: number) => {
-    const { address } = this.props
     const { errors } = this.state.sendRowDetails[index]
 
     if (!wallet.isAddress(formAddress)) {
@@ -352,7 +353,8 @@ export default class Send extends React.Component<Props, State> {
       const newState = [...prevState.sendRowDetails]
 
       const objectToClear = newState[index]
-      if (objectToClear.errors[field]) {
+
+      if (get(objectToClear, ['errors', field])) {
         objectToClear.errors[field] = null
       }
 

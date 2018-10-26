@@ -91,7 +91,7 @@ export const participateInSale = (
     publicKey: isHardwareLogin ? publicKey : null,
     signingFunction: isHardwareLogin ? signingFunction : null,
     approvalMessage: (tx) => {
-      dispatch(
+      window.currentNotificationId = dispatch(
         showInfoNotification({
           message: `Please authorize the Token Purchase transaction ${tx.hash} on your smartphone`,
           autoDismiss: 0
@@ -106,6 +106,10 @@ export const participateInSale = (
     if (!response || !response.response || !response.response.result) {
       throw new Error('Rejected by RPC server.')
     }
+
+    if (window.currentNotificationId)
+      dispatch(hideNotification(window.currentNotificationId))
+
   } catch (err) {
     dispatch(
       showErrorNotification({
@@ -116,6 +120,5 @@ export const participateInSale = (
   }
 
   // $FlowFixMe
-  // dispatch(hideNotification(notificationId))
   return true
 }

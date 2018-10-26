@@ -2,15 +2,24 @@
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { compose } from 'recompose'
-import { withData, withActions, type Actions } from 'spunky'
+import {
+  withData,
+  withActions,
+  type Actions,
+  withCall,
+  withRecall,
+  withReset
+} from 'spunky'
 
 import Settings from './Settings'
 import withExplorerData from '../../hocs/withExplorerData'
 import withCurrencyData from '../../hocs/withCurrencyData'
 import withThemeData from '../../hocs/withThemeData'
+import withSoundEnabledData from '../../hocs/withSoundEnabledData'
 import accountsActions, {
   updateAccountsActions
 } from '../../actions/accountsActions'
+import pricesActions from '../../actions/pricesActions'
 import { updateSettingsActions } from '../../actions/settingsActions'
 import { getNetworks } from '../../core/networks'
 import {
@@ -21,6 +30,7 @@ import { showModal } from '../../modules/modal'
 import networkActions from '../../actions/networkActions'
 import withNetworkData from '../../hocs/withNetworkData'
 import nodeStorageActions from '../../actions/nodeStorageActions'
+import dashboardActions from '../../actions/dashboardActions'
 
 const mapStateToProps = () => ({
   networks: getNetworks()
@@ -55,7 +65,8 @@ const mapSettingsActionsToProps = actions => ({
   setTheme: theme =>
     actions.call({
       theme
-    })
+    }),
+  setSoundSetting: soundEnabled => actions.call({ soundEnabled })
 })
 
 const mapActionsToProps = (actions: Actions, props: Object): Object => ({
@@ -71,13 +82,19 @@ export default compose(
     mapStateToProps,
     mapDispatchToProps
   ),
+  withNetworkData(),
+  withCall(nodeStorageActions),
   withData(accountsActions, mapAccountsDataToProps),
   withData(nodeStorageActions, mapSelectedNodeDataToProps),
-  withNetworkData(),
   withExplorerData(),
   withCurrencyData(),
   withThemeData(),
+  withSoundEnabledData(),
   withActions(networkActions, mapActionsToProps),
+  withRecall(nodeStorageActions, ['networkId']),
   withActions(updateAccountsActions, mapAccountsActionsToProps),
-  withActions(updateSettingsActions, mapSettingsActionsToProps)
+  withActions(updateSettingsActions, mapSettingsActionsToProps),
+  withReset(dashboardActions, ['currency']),
+  withReset(pricesActions, ['currency']),
+  withRecall(dashboardActions, ['currency'])
 )(Settings)

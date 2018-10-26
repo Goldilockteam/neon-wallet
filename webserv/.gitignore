@@ -5,3 +5,4 @@
 /deploy/www/test.js
 /local.conf
 /deploy/www/*.svg
+/deploy/www/*.wav

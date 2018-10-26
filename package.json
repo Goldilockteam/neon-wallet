@@ -33,6 +33,7 @@
   "build": {
     "appId": "com.electron.neon",
     "files": [
+      "./preload.js",
       "./main.js",
       "app/dist/index.html",
       "app/dist/bundle.js",
@@ -87,6 +88,7 @@
     "fs": "^0.0.1-security",
     "global": "4.3.2",
     "history": "4.7.2",
+    "howler": "^2.0.15",
     "instascan": "^1.0.0",
     "isomorphic-fetch": "2.2.1",
     "lodash": "^4.17.11",
@@ -110,6 +112,7 @@
     "react-router-dom": "4.3.1",
     "react-select": "^2.0.0",
     "react-split-pane": "0.1.68",
+    "react-switch": "^3.0.4",
     "react-syntax-highlighter": "5.8.0",
     "react-tabs": "^2.2.2",
     "react-test-renderer": "16.1.1",
@@ -148,7 +151,7 @@
     "babel-preset-stage-0": "6.24.1",
     "cross-env": "5.1.1",
     "css-loader": "0.28.7",
-    "electron": "2.0.7",
+    "electron": "2.0.12",
     "electron-builder": "20.20.4",
     "electron-devtools-installer": "2.2.4",
     "electron-packager": "^12.0.1",

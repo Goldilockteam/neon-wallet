@@ -120,7 +120,7 @@ class SendRecipientListItem extends Component<Props> {
     ) : (
       <SelectInput
         placeholder="Add wallet or select contact"
-        value={address}
+        value={address || ''}
         name="address"
         onChange={this.handleFieldChange}
         items={this.createContactList()}

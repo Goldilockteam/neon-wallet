@@ -24,7 +24,9 @@ type Props = {
   loading: Boolean,
   loadNodesData: Function,
   saveSelectedNode: Function,
-  selectedNode: string
+  selectedNode: string,
+  net: string,
+  networkId: string
 }
 
 type State = {
@@ -45,6 +47,7 @@ export default class NodeSelect extends React.Component<Props, State> {
         renderHeaderIcon={this.renderIcon}
         renderInstructions={false}
         instructionsClassName={styles.instructions}
+        containerClassName={styles.nodeSelectContainer}
       >
         <div className={styles.instructions}>
           If you’re experiencing performance issues, try selecting a custom node
@@ -78,10 +81,10 @@ export default class NodeSelect extends React.Component<Props, State> {
   }
 
   handleRefreshNodeData = () => {
-    const { loading, loadNodesData } = this.props
+    const { loading, loadNodesData, networkId } = this.props
     const { refreshDisabled } = this.state
     if (!refreshDisabled) {
-      loadNodesData()
+      loadNodesData({ networkId })
       this.setState({ refreshDisabled: true })
       setTimeout(() => {
         this.setState({ refreshDisabled: false })
@@ -117,8 +120,8 @@ export default class NodeSelect extends React.Component<Props, State> {
   }
 
   handleSelect = (url: string) => {
-    const { saveSelectedNode } = this.props
-    saveSelectedNode(url)
+    const { saveSelectedNode, net } = this.props
+    saveSelectedNode({ url, net })
   }
 
   getLatencyClass = (latency: number) => {
