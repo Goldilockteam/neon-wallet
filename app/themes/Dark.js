@@ -1,4 +1,6 @@
 const BASE = {
+  '--base-scrollbar-track': '#2E3542',
+  '--base-scrollbar-thumb': '#5c677f',
   '--base-main-background': '#242933',
   '--base-text': '#fff',
   '--base-link-color': '#6bdaf6'
@@ -76,7 +78,7 @@ const DASHBOARD = {
   '--dashboard-asset-panel-total-background': '#343B4A',
   '--dashboard-total-wallet-value-odd-row': '#343B4A',
   '--dashboard-total-wallet-value-total-text': '#fff',
-  '--dashboard-asset-panel-asset-name': 'rgba(255, 255, 255, 0.5)',
+  '--dashboard-asset-panel-asset-name': 'rgba(255, 255, 255, 0.9)',
   '--dashboard-token-balances-divider-line': '#343B4A',
   '--dashboard-price-history-current-price': '#fff'
 }

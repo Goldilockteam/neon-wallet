@@ -94,8 +94,10 @@ class TokenModal extends Component<Props, State> {
         return token
       })
       setUserGeneratedTokens([...validatedTokens])
-      onSave()
-      hideModal()
+      setTimeout(() => {
+        onSave()
+        hideModal()
+      }, 100)
     }
   }
 
@@ -121,7 +123,6 @@ class TokenModal extends Component<Props, State> {
   render() {
     const { hideModal } = this.props
     const { tokens, errorItemId, errorType, networkOption } = this.state
-
     const networkId = networkOption.id
 
     const customTokenListLength = tokens.filter(

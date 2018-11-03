@@ -13,10 +13,18 @@ import styles from '../SendPanel.scss'
 
 type Props = {
   handleEditRecipientsClick: () => any,
-  fees: number
+  fees: number,
+  pendingTransaction: boolean
 }
 
-const ConfirmSend = ({ handleEditRecipientsClick, fees, isConfirmSendDisabled, disableConfirmSend, handleSend }: Props) => (
+const ConfirmSend = ({
+  handleEditRecipientsClick,
+  fees,
+  pendingTransaction,
+  isConfirmSendDisabled,
+  disableConfirmSend,
+  handleSend
+}: Props) => (
   <section>
     <DialogueBox
       icon={<WarningIcon />}
@@ -43,6 +51,7 @@ const ConfirmSend = ({ handleEditRecipientsClick, fees, isConfirmSendDisabled, d
             handleSend(e)
           }}
           type="submit"
+          disabled={pendingTransaction}
         >
           Confirm & Send
         </Button>

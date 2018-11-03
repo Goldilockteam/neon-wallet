@@ -6,7 +6,8 @@ import {
   toNumber,
   toBigNumber,
   multiplyNumber,
-  minusNumber
+  minusNumber,
+  isNumber
 } from '../../core/math'
 
 import { isBlacklisted } from '../../core/wallet'
@@ -31,11 +32,14 @@ type Props = {
   address: string,
   shouldRenderHeaderBar: boolean,
   location: Object,
-  showSendModal: (props: Object) => any
+  showSendModal: (props: Object) => any,
+  tokens: Array<TokenItemType>,
+  networkId: string
 }
 
 type State = {
   showConfirmSend: boolean,
+  pendingTransaction: boolean,
   sendSuccess: boolean,
   sendError: boolean,
   sendErrorMessage: string,
@@ -50,6 +54,7 @@ export default class Send extends React.Component<Props, State> {
     super(props)
     this.state = {
       showConfirmSend: false,
+      pendingTransaction: false,
       sendSuccess: false,
       sendError: false,
       sendErrorMessage: '',
@@ -60,7 +65,8 @@ export default class Send extends React.Component<Props, State> {
   }
 
   static defaultProps = {
-    shouldRenderHeaderBar: true
+    shouldRenderHeaderBar: true,
+    tokens: []
   }
 
   componentDidMount() {
@@ -168,6 +174,7 @@ export default class Send extends React.Component<Props, State> {
   updateRowField = (index: number, field: string, value: string) => {
     this.setState((prevState: Object) => {
       const newState = [...prevState.sendRowDetails]
+      const { sendableAssets } = this.props
 
       const objectToModify = newState[index]
 
@@ -180,28 +187,53 @@ export default class Send extends React.Component<Props, State> {
       }
 
       if (field === 'amount') {
+        const valueAsString = value.toString()
+
+        const additionalValue =
+          toNumber(valueAsString.replace(/,/g, '')) >
+          toNumber(sendableAssets[objectToModify.asset].balance)
+            ? 0
+            : toNumber(valueAsString.replace(/,/g, ''))
+
         const maxValue =
-          this.calculateMaxValue(objectToModify.asset) + Number(value)
+          Number(this.calculateMaxValue(objectToModify.asset)) + additionalValue
+
         objectToModify.max = maxValue
       }
 
       if (field === 'address') {
         objectToModify.address = value
       }
-
       return { sendRowDetails: newState }
     })
   }
 
   calculateMaxValue = (asset: string) => {
-    const { sendableAssets } = this.props
-
+    const { sendableAssets, tokens, networkId } = this.props
     const existingAmounts = this.calculateRowAmounts(asset)
-
-    if (sendableAssets[asset]) {
-      return minusNumber(sendableAssets[asset].balance, existingAmounts)
+    let decimals = 8
+    if (asset === 'NEO') {
+      decimals = 0
     }
-    return 0
+    if (asset === 'GAS') {
+      decimals = 8
+    } else {
+      const foundToken: TokenItemType | void = tokens.find(
+        token => token.symbol === asset && token.networkId === networkId
+      )
+      if (foundToken) {
+        decimals = get(foundToken, 'decimals', 8)
+      }
+    }
+    if (sendableAssets[asset]) {
+      const max = toNumber(decimals)
+        ? minusNumber(sendableAssets[asset].balance, existingAmounts).toFixed(
+            decimals
+          )
+        : minusNumber(sendableAssets[asset].balance, existingAmounts)
+      return max < 0 ? toNumber(sendableAssets[asset].balance) : max
+    }
+    return toNumber(get(sendableAssets, [asset, 'balance'], 0))
   }
 
   calculateRowAmounts = (asset: string) => {
@@ -210,7 +242,11 @@ export default class Send extends React.Component<Props, State> {
     if (rows.length > 0) {
       return (rows
         .filter((row: Object) => row.asset === asset)
-        .map((row: Object) => Number(row.amount))
+        .map((row: Object) =>
+          get(row, 'amount', '0')
+            .toString()
+            .replace(/,/g, '')
+        )
         .reduce(
           (accumulator: Object, currentValue: number | void) =>
             accumulator.plus(currentValue || 0),
@@ -262,12 +298,21 @@ export default class Send extends React.Component<Props, State> {
       symbol: row.asset
     }))
 
+    this.setState({ pendingTransaction: true })
     sendTransaction({ sendEntries: entries, fees })
       .then((result: Object) => {
-        this.setState({ sendSuccess: true, txid: result.txid })
+        this.setState({
+          sendSuccess: true,
+          txid: result.txid,
+          pendingTransaction: false
+        })
       })
       .catch((error: Object) => {
-        this.setState({ sendError: true, sendErrorMessage: error.message })
+        this.setState({
+          sendError: true,
+          sendErrorMessage: error.message,
+          pendingTransaction: false
+        })
       })
   }
 
@@ -297,6 +342,7 @@ export default class Send extends React.Component<Props, State> {
     index: number
   ) => {
     const { errors } = this.state.sendRowDetails[index]
+    const { tokens, networkId } = this.props
 
     const amountNum = Number(amount)
 
@@ -318,6 +364,23 @@ export default class Send extends React.Component<Props, State> {
 
     if (amountNum > max) {
       errors.amount = `You do not have enough balance to send ${amount} ${asset}.`
+    }
+
+    if (asset !== 'NEO' && asset !== 'GAS') {
+      const decpoint =
+        amountNum.toString().length - 1 - amountNum.toString().indexOf('.')
+
+      const foundToken: TokenItemType | void = tokens.find(
+        token => token.symbol === asset && token.networkId === networkId
+      )
+
+      if (foundToken && decpoint > toNumber(get(foundToken, 'decimals', 8))) {
+        errors.amount = `You can only send ${asset} up to ${get(
+          foundToken,
+          'decimals',
+          8
+        )} decimals.`
+      }
     }
 
     if (errors.amount) {
@@ -373,7 +436,8 @@ export default class Send extends React.Component<Props, State> {
       sendError,
       sendErrorMessage,
       txid,
-      fees
+      fees,
+      pendingTransaction
     } = this.state
     const {
       sendableAssets,
@@ -401,6 +465,7 @@ export default class Send extends React.Component<Props, State> {
           sendRowDetails={sendRowDetails}
           sendableAssets={sendableAssets}
           showConfirmSend={showConfirmSend}
+          pendingTransaction={pendingTransaction}
           sendSuccess={sendSuccess}
           sendError={sendError}
           sendErrorMessage={sendErrorMessage}

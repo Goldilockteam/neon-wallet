@@ -1,5 +1,16 @@
 {
   "ICOTokens": [
-    {"id":"16","symbol":"LOCK","scriptHash":"c36a622ad044df617634460a0f68e9023c0aa4aa","networkId":"2","isUserGenerated":false}
+    {
+      "id": "16",
+      "symbol": "LOCK",
+      "scriptHash": "c36a622ad044df617634460a0f68e9023c0aa4aa",
+      "networkId": "2",
+      "isUserGenerated": false
+    },
+    {
+      "id": "c9c0fc5a2b66a29d6b14601e752e6e1a445e088d",
+      "symbol": "NOS",
+      "scriptHash": "c9c0fc5a2b66a29d6b14601e752e6e1a445e088d"
+    }
   ]
 }

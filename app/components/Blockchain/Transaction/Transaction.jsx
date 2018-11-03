@@ -21,7 +21,8 @@ type Props = {
   networkId: string,
   explorer: ExplorerType,
   contacts: Object,
-  showAddContactModal: ({ address: string }) => null
+  showAddContactModal: ({ address: string }) => null,
+  address: string
 }
 
 export default class Transaction extends React.Component<Props> {
@@ -79,6 +80,12 @@ export default class Transaction extends React.Component<Props> {
   renderAbstract = (type: string) => {
     const { tx } = this.props
     const { iconType, time, label, amount, isNetworkFee, to, from } = tx
+
+    const formattedTime = moment.unix(time).format('MM/DD/YYYY | HH:mm:ss')
+
+    const contactTo = this.findContact(to)
+    const contactToExists = contactTo !== to
+
     switch (type) {
       case 'CLAIM':
         return (
@@ -88,15 +95,13 @@ export default class Transaction extends React.Component<Props> {
                 <ClaimIcon />
               </div>
             </div>
-            <div className={styles.txDateContainer}>
-              {moment.unix(time).format('MM/DD/YYYY | HH:MM:ss')}
-            </div>
+            <div className={styles.txDateContainer}>{formattedTime}</div>
             <div className={styles.txLabelContainer}>{label}</div>
             <div className={styles.txAmountContainer}>{amount}</div>
             <div className={styles.txToContainer}>
               <Fragment>
-                {this.findContact(to)}
-                {this.findContact(to) === to && (
+                {contactTo}
+                {!contactToExists && (
                   <CopyToClipboard
                     className={styles.copy}
                     text={to}
@@ -116,18 +121,16 @@ export default class Transaction extends React.Component<Props> {
                 <SendIcon />
               </div>
             </div>
-            <div className={styles.txDateContainer}>
-              {moment.unix(time).format('MM/DD/YYYY | HH:MM:ss')}
-            </div>
+            <div className={styles.txDateContainer}>{formattedTime}</div>
             <div className={styles.txLabelContainer}>{label}</div>
             <div className={styles.txAmountContainer}>{amount}</div>
             <div className={styles.txToContainer}>
               {isNetworkFee ? (
-                <div className={styles.largerFont}> {to} </div>
+                to
               ) : (
                 <Fragment>
-                  {this.findContact(to)}
-                  {this.findContact(to) === to && (
+                  {contactTo}
+                  {!contactToExists && (
                     <CopyToClipboard
                       className={styles.copy}
                       text={to}
@@ -144,14 +147,18 @@ export default class Transaction extends React.Component<Props> {
                 className={styles.transactionHistoryButton}
                 renderIcon={ContactsAdd}
                 onClick={this.displayModal}
-                disabled={this.findContact(to) !== to}
+                disabled={contactToExists}
               >
                 Add
               </Button>
             )}
           </div>
         )
-      case 'RECEIVE':
+      case 'RECEIVE': {
+        const contactFrom = this.findContact(from)
+        const contactFromExists = contactFrom !== from
+        const isMintTokens = from === 'MINT TOKENS'
+        const isGasClaim = this.props.address === from && !Number(amount)
         return (
           <div className={styles.abstractContainer}>
             <div className={styles.txTypeIconContainer}>
@@ -159,15 +166,13 @@ export default class Transaction extends React.Component<Props> {
                 <ReceiveIcon />
               </div>
             </div>
-            <div className={styles.txDateContainer}>
-              {moment.unix(time).format('MM/DD/YYYY | HH:MM:ss')}
-            </div>
+            <div className={styles.txDateContainer}>{formattedTime}</div>
             <div className={styles.txLabelContainer}>{label}</div>
             <div className={styles.txAmountContainer}>{amount}</div>
             <div className={styles.txToContainer}>
-              {this.findContact(from)}
-              {this.findContact(from) === from &&
-                from !== 'MINT TOKENS' && (
+              {contactFrom}
+              {!contactFromExists &&
+                !isMintTokens && (
                   <CopyToClipboard
                     className={styles.copy}
                     text={from}
@@ -175,19 +180,21 @@ export default class Transaction extends React.Component<Props> {
                   />
                 )}
             </div>
-            {this.findContact(from) !== from ? (
+            {isMintTokens || isGasClaim ? (
               <div className={styles.transactionHistoryButton} />
             ) : (
               <Button
                 className={styles.transactionHistoryButton}
                 renderIcon={ContactsAdd}
                 onClick={this.displayModal}
+                disabled={contactFromExists}
               >
                 Add
               </Button>
             )}
           </div>
         )
+      }
 
       default:
         console.warn('renderTxTypeIcon() invoked with an invalid argument!', {
