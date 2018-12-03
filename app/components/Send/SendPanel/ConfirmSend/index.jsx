@@ -36,6 +36,7 @@ const ConfirmSend = ({
         renderIcon={() => <ErrorIcon />}
         disabled={isConfirmSendDisabled()}
         onClick={handleEditRecipientsClick}
+        disabled={pendingTransaction}
       >
         Edit Recipients
       </Button>

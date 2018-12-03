@@ -1,5 +1,6 @@
 // @flow
 import React from 'react'
+import classNames from 'classnames'
 
 import LightningIcon from '../../../assets/icons/lightning.svg'
 import Button from '../../Button/Button'
@@ -15,9 +16,9 @@ type Props = {
 
 const FEE_OPTIONS = [
   {
-    fee: 0.00000001,
+    fee: 0.001,
     description: 'Fast',
-    precision: 8
+    precision: 3
   },
   {
     fee: 0.05,
@@ -43,16 +44,20 @@ export default class PriorityFee extends React.Component<Props> {
           {FEE_OPTIONS.map(option => (
             <Button
               key={option.description}
-              className={styles.sendFormButton}
+              className={classNames(styles.sendFormButton, {
+                [styles.activeButton]: fees === option.fee
+              })}
               primary
               renderIcon={() => <LightningIcon />}
-              active={fees === option.fee ? true : undefined}
+              active={fees === option.fee}
               disabled={this.shouldDisableFeeButton(
                 disabled,
                 availableGas,
                 option.fee
               )}
-              onClick={() => handleAddPriorityFee(option.fee)}
+              onClick={() =>
+                handleAddPriorityFee(fees === option.fee ? 0 : option.fee)
+              }
             >
               <div>
                 <div className={styles.speed}>{option.description}</div>

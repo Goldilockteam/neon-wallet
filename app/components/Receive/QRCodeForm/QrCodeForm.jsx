@@ -7,17 +7,13 @@ import AssetInput from '../../Inputs/AssetInput'
 import NumberInput from '../../Inputs/NumberInput'
 import TextInput from '../../Inputs/TextInput'
 import Button from '../../Button/Button'
-import CopyToClipboard from '../../CopyToClipboard'
 import { Address } from '../../Blockchain'
 import { ASSETS, TOKENS } from '../../../core/constants'
-import {
-  COIN_DECIMAL_LENGTH,
-  toFixedDecimals,
-  formatNEO
-} from '../../../core/formatters'
+import { formatNEO } from '../../../core/formatters'
 import GridIcon from '../../../assets/icons/grid.svg'
 
 import styles from './styles.scss'
+import { toBigNumber, toNumber } from '../../../core/math'
 
 type Props = {
   className?: string,
@@ -29,7 +25,8 @@ type Props = {
 type State = {
   asset: ?string,
   amount: ?number | ?string,
-  description: ?string
+  description: ?string,
+  error: ?string
 }
 
 export default class QRCodeForm extends React.Component<Props, State> {
@@ -38,7 +35,8 @@ export default class QRCodeForm extends React.Component<Props, State> {
   state = {
     asset: ASSETS.NEO,
     amount: undefined,
-    description: undefined
+    description: undefined,
+    error: undefined
   }
 
   render() {
@@ -52,13 +50,15 @@ export default class QRCodeForm extends React.Component<Props, State> {
           className={styles.form}
           onSubmit={(event) => {
             event.preventDefault()
-            onSubmit({
-              address,
-              asset:
-                (TOKENS[asset] && TOKENS[asset].networks['1'].hash) || asset,
-              amount,
-              description
-            })
+            if (this.validateForm()) {
+              onSubmit({
+                address,
+                asset:
+                  (TOKENS[asset] && TOKENS[asset].networks['1'].hash) || asset,
+                amount,
+                description
+              })
+            }
           }}
         >
           <div className={styles.amountContainer}>
@@ -78,13 +78,11 @@ export default class QRCodeForm extends React.Component<Props, State> {
                 options={{
                   numeralDecimalScale: 8
                 }}
-                // this is a hack because Cleave will not update
-                // when props change https://github.com/nosir/cleave.js/issues/352
-                onChange={value =>
+                error={this.state.error}
+                onChange={e =>
                   this.setState({
-                    amount: !this.determineDecimalScale()
-                      ? formatNEO(value)
-                      : value
+                    amount: e.target.rawValue,
+                    error: undefined
                   })
                 }
               />
@@ -119,6 +117,59 @@ export default class QRCodeForm extends React.Component<Props, State> {
         </form>
       </div>
     )
+  }
+
+  validateForm = () => {
+    const { amount, asset } = this.state
+    const { networkId } = this.props
+
+    let valid = false
+
+    if (asset && amount) {
+      const amountNum = Number(amount)
+      const decpoint =
+        amountNum.toString().length - 1 - amountNum.toString().indexOf('.')
+
+      let validDecimals = get(
+        TOKENS[asset],
+        `networks.${networkId}.decimals`,
+        8
+      )
+
+      if (asset === 'NEO') validDecimals = 0
+
+      if (!validDecimals && !toBigNumber(amountNum).isInteger()) {
+        valid = false
+        this.setState({
+          error: `You canot request fractional ${asset}.`
+        })
+        return valid
+      }
+      if (decpoint > validDecimals && validDecimals) {
+        valid = false
+        this.setState({
+          error: `You can only request ${asset} up to ${validDecimals} decimals.`
+        })
+        return valid
+      }
+      if (toBigNumber(amountNum).greaterThan(toBigNumber(1000000000))) {
+        valid = false
+        this.setState({
+          error: `You cannot request more than 100,000,000 ${asset}.`
+        })
+        return valid
+      }
+      if (!toNumber(amountNum)) {
+        valid = false
+        this.setState({
+          error: `You cannot request 0 ${asset}.`
+        })
+        return valid
+      }
+      valid = true
+    }
+
+    return valid
   }
 
   determineDecimalScale = () => {

@@ -1,6 +1,8 @@
 // @flow
 import { wallet, api } from 'neon-js'
-import { flatten } from 'lodash-es'
+import { flatten, isEmpty } from 'lodash-es'
+
+import { getNode, getRPCEndpoint } from '../actions/nodeStorageActions'
 
 import {
   showErrorNotification,
@@ -25,7 +27,7 @@ export const participateInSale = (
   neoToSend: string,
   gasToSend: string,
   scriptHash: string,
-  gasCost: string = '0'
+  fees: number = 0
 ) => async (dispatch: DispatchType, getState: GetStateType) => {
   const state = getState()
   // const wif = getWIF(state)
@@ -36,6 +38,10 @@ export const participateInSale = (
   const address = getAddress(state)
   const isHardwareLogin = getIsHardwareLogin(state)
   const signingFunction = getSigningFunction(state)
+  let url = await getNode(net)
+  if (!url) {
+    url = await getRPCEndpoint(net)
+  }
 
   // const account = new wallet.Account(wif)
   const neoToMint = toNumber(neoToSend)
@@ -90,6 +96,8 @@ export const participateInSale = (
     gas: 0,
     publicKey: isHardwareLogin ? publicKey : null,
     signingFunction: isHardwareLogin ? signingFunction : null,
+    fees,
+    url,
     approvalMessage: (tx) => {
       window.currentNotificationId = dispatch(
         showInfoNotification({

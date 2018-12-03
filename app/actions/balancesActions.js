@@ -1,16 +1,17 @@
 // @flow
 import { api } from 'neon-js'
-import { extend, isEmpty } from 'lodash-es'
+import { extend, isEmpty, get } from 'lodash-es'
 import { createActions } from 'spunky'
 import { Howl } from 'howler'
 // eslint-disable-next-line $FlowFixMe
 import coinAudioSample from '../assets/audio/coin.wav'
 
 import { getSettings } from './settingsActions'
-import { getNode } from './nodeStorageActions'
+import { getNode, getRPCEndpoint } from './nodeStorageActions'
 import { ASSETS } from '../core/constants'
 import { COIN_DECIMAL_LENGTH } from '../core/formatters'
 import { toBigNumber } from '../core/math'
+import { findNetworkByLabel } from '../core/networks'
 
 const MAX_SCRIPT_HASH_CHUNK_SIZE = 5
 
@@ -68,7 +69,12 @@ function determineIfBalanceUpdated(
 
 async function getBalances({ net, address }: Props) {
   const { soundEnabled, tokens } = await getSettings()
+  const network = findNetworkByLabel(net)
+
   let endpoint = await getNode(net)
+  if (!endpoint) {
+    endpoint = await getRPCEndpoint(net)
+  }
 
   let networkHasChanged = true
   if (net === inMemoryNetwork) networkHasChanged = false
@@ -76,10 +82,6 @@ async function getBalances({ net, address }: Props) {
   let adressHasChanged = false
   if (!inMemoryAddress) adressHasChanged = false
   else if (inMemoryAddress !== address) adressHasChanged = true
-
-  if (isEmpty(endpoint)) {
-    endpoint = await api.getRPCEndpointFrom({ net }, api.neoscan)
-  }
 
   const chunks = tokens
     .filter(token => !token.isUserGenerated)
@@ -129,7 +131,9 @@ async function getBalances({ net, address }: Props) {
   // Handle manually added script hashses here
   const userGeneratedTokenInfo = []
   // eslint-disable-next-line
-  for (const token of tokens.filter(token => token.isUserGenerated)) {
+  for (const token of tokens.filter(
+    token => token.isUserGenerated && token.networkId === network.id
+  )) {
     // eslint-disable-next-line
     const info = await api.nep5
       .getToken(endpoint, token.scriptHash, address)
@@ -164,9 +168,11 @@ async function getBalances({ net, address }: Props) {
   })
 
   // asset balances
-  const assetBalances = await api.getBalanceFrom({ net, address }, api.neoscan)
+  const assetBalances = await api
+    .getBalanceFrom({ net, address }, api.neoscan)
+    .catch(e => console.error(e))
 
-  const { assets } = assetBalances.balance
+  const assets = get(assetBalances, 'balance.assets', {})
   // The API doesn't always return NEO or GAS keys if, for example, the address only has one asset
   const neoBalance = assets.NEO ? assets.NEO.balance.toString() : '0'
   const gasBalance = assets.GAS

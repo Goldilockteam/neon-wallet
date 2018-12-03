@@ -1,7 +1,7 @@
 // @flow
 /* eslint-disable camelcase */
 import { api, sc, u, wallet } from 'neon-js'
-import { flatMap, keyBy } from 'lodash-es'
+import { flatMap, keyBy, isEmpty } from 'lodash-es'
 
 import {
   showErrorNotification,
@@ -24,6 +24,7 @@ import {
   getTokenBalancesMap
 } from '../core/wallet'
 import { toNumber } from '../core/math'
+import { getNode, getRPCEndpoint } from '../actions/nodeStorageActions'
 
 const extractTokens = (sendEntries: Array<SendEntryType>) =>
   sendEntries.filter(({ symbol }) => isToken(symbol))
@@ -113,6 +114,10 @@ export const sendTransaction = ({
     const signingFunction = getSigningFunction(state)
     const publicKey = getPublicKey(state)
     const isHardwareSend = getIsHardwareLogin(state)
+    let url = await getNode(net)
+    if (isEmpty(url)) {
+      url = await getRPCEndpoint(net)
+    }
 
     const rejectTransaction = (message: string) =>
       dispatch(showErrorNotification({ message }))
@@ -120,6 +125,7 @@ export const sendTransaction = ({
     const error = validateTransactionsBeforeSending(balances, sendEntries)
 
     if (error) {
+      console.error({ error })
       rejectTransaction(error)
       return reject(error)
     }
@@ -150,16 +156,34 @@ export const sendTransaction = ({
       }
     }
 
-    try {
-      const { response } = await makeRequest(sendEntries, {
-        net,
-        tokensBalanceMap,
-        address: fromAddress,
-        publicKey,
-        // privateKey: new wallet.Account(wif).privateKey,
-        signingFunction: isHardwareSend ? signingFunction : null,
-        fees
+    const config = {
+      net,
+      tokensBalanceMap,
+      address: fromAddress,
+      publicKey,
+      // privateKey: new wallet.Account(wif).privateKey,
+      signingFunction: isHardwareSend ? signingFunction : null,
+      fees,
+      url
+    }
+
+    await api
+      .getBalanceFrom({ net, address: fromAddress }, api.neoscan)
+      .catch(e => {
+        // indicates that neo scan is down and that api.sendAsset and api.doInvoke
+        // will fail unless balances are supplied
+        console.error(e)
+        const Balance = new wallet.Balance({ address: fromAddress, net })
+        // $FlowFixMe
+        Object.values(tokensBalanceMap).forEach(({ name, balance }) => {
+          Balance.addAsset(name, { balance, unspent: [] })
+        })
+        // $FlowFixMe
+        config.balance = Balance
       })
+
+    try {
+      const { response } = await makeRequest(sendEntries, config)
 
       if (!response.result) {
         throw new Error('Rejected by RPC server.')
@@ -174,6 +198,7 @@ export const sendTransaction = ({
 
       return resolve(response)
     } catch (err) {
+      console.error({ err })
       rejectTransaction(`Transaction failed: ${err.message}`)
       return reject(err)
     }

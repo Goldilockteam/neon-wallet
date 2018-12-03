@@ -3,9 +3,10 @@ import React, { Component } from 'react'
 
 import SelectInput from '../../../../Inputs/SelectInput'
 import NumberInput from '../../../../Inputs/NumberInput'
-import TextInput from '../../../../Inputs/TextInput'
 import DisplayInput from '../../../DisplayInput'
-import { toBigNumber } from '../../../../../core/math'
+
+import { toBigNumber, toNumber } from '../../../../../core/math'
+import { formatNumberByDecimalScale } from '../../../../../core/formatters'
 
 import TrashCanIcon from '../../../../../assets/icons/delete.svg'
 
@@ -24,43 +25,44 @@ type Props = {
   numberOfRecipients: number,
   clearErrors: (index: number, field: string) => any,
   removeRow: (index: number) => any,
-  updateRowField: (index: number, field: string, value: any) => any
+  updateRowField: (index: number, field: string, value: any) => any,
+  calculateMaxValue: (asset: string, index: number) => string
 }
 
 class SendRecipientListItem extends Component<Props> {
-  handleFieldChange = (e: Object) => {
+  handleFieldChange = (value: string, type: 'asset' | 'amount' | 'address') => {
     const {
       index,
       updateRowField,
       contacts,
-      sendableAssets,
       clearErrors,
-      max
+      calculateMaxValue,
+      asset
     } = this.props
 
-    const isAssetString = Object.keys(sendableAssets).find(asset => asset === e)
-    if (isAssetString) return updateRowField(index, 'asset', e)
+    let normalizedValue = value
 
-    const isContactString = Object.keys(contacts).find(contact => contact === e)
-    if (isContactString) {
-      updateRowField(index, 'address', contacts[e])
-      return clearErrors(index, 'address')
+    if (type === 'address') {
+      const isContactString = Object.keys(contacts).find(
+        contact => contact === value
+      )
+      if (isContactString) {
+        normalizedValue = contacts[value]
+      }
+    } else if (type === 'amount' && value) {
+      const dynamicMax = calculateMaxValue(asset, index)
+      normalizedValue = toBigNumber(value).gt(toBigNumber(dynamicMax))
+        ? dynamicMax
+        : value
     }
 
-    const { name } = e.target
-    let { value } = e.target
-
-    const valueIsGreaterThanMax = toBigNumber(
-      value.replace(/,/g, '')
-    ).greaterThan(toBigNumber(max))
-
-    if (valueIsGreaterThanMax) value = max.toString()
-    clearErrors(index, name)
-    return updateRowField(index, name, value)
+    clearErrors(index, type)
+    updateRowField(index, type, normalizedValue)
   }
 
   handleMaxClick = () => {
-    const { index, updateRowField, max } = this.props
+    const { index, updateRowField, calculateMaxValue, asset } = this.props
+    const max = calculateMaxValue(asset, index)
     updateRowField(index, 'amount', max.toString())
   }
 
@@ -97,23 +99,21 @@ class SendRecipientListItem extends Component<Props> {
       <SelectInput
         value={asset}
         name="asset"
-        onChange={this.handleFieldChange}
+        onChange={value => this.handleFieldChange(value, 'asset')}
         items={this.createAssetList()}
-        customChangeEvent
         onFocus={this.clearErrorsOnFocus}
         disabled
       />
     )
 
     const numberInput = showConfirmSend ? (
-      <DisplayInput value={amount} />
+      <DisplayInput value={formatNumberByDecimalScale(amount)} />
     ) : (
       <NumberInput
         value={amount || 0}
         max={max}
         name="amount"
-        onChange={this.handleFieldChange}
-        customChangeEvent
+        onChange={(e, value) => this.handleFieldChange(value, 'amount')}
         handleMaxClick={this.handleMaxClick}
         onFocus={this.clearErrorsOnFocus}
         error={errors && errors.amount}
@@ -128,9 +128,8 @@ class SendRecipientListItem extends Component<Props> {
         placeholder="Add wallet or select contact"
         value={address || ''}
         name="address"
-        onChange={this.handleFieldChange}
+        onChange={value => this.handleFieldChange(value, 'address')}
         items={this.createContactList()}
-        customChangeEvent
         onFocus={this.clearErrorsOnFocus}
         error={errors && errors.address}
       />
