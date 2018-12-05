@@ -17,6 +17,28 @@ const authy_register_user = promisify(authy.register_user.bind(authy))
 const authy_send_approval_request = promisify(authy.send_approval_request.bind(authy))
 const authy_check_approval_status = promisify(authy.check_approval_status.bind(authy))
 const MAX_AUTHY_POLL_ERRORS = 5
+const presetAuthyUserId = args.authyUserId
+var authyUserIdUsedForLogin = null
+
+const getAuthyUserId = () => {
+  if(presetAuthyUserId) {
+    console.log(`using preset authy user id: ${presetAuthyUserId}`)
+    return presetAuthyUserId
+  }
+
+  // simmply grab the first number encountered in the hostname
+  const hostname = os.hostname()
+  const res = /(\d+)/.exec(hostname)
+  if(res == null) {
+    console.log(`cannot determine authy user id from hostname ${hostname}`)
+    return null
+  }
+  else {
+    const authyUserId = res[0]
+    console.log(`determined authy user id ${authyUserId} from hostname ${hostname}`)
+    return authyUserId
+  }
+}
 
 require('assert')(module == process.mainModule)
 exports.nativeScrypt = require('@mlink/scrypt')
@@ -171,7 +193,13 @@ wss.on('connection', (ws) => {
       if(msg.fn == 'authy-login-code') {
         // TODO ban the IP after 3 retries
         // generate authy code for identification purposes
-        if(args.authyLoginEnabled === 'true') {
+
+        authyUserIdUsedForLogin = getAuthyUserId()
+        if(authyUserIdUsedForLogin == null) {
+          // message the frontend to display a wait-for-device-init message
+          authyCode = -1
+        }
+        else if(args.authyLoginEnabled === 'true') {
           authyCode = Math.floor(1000 + Math.random() * 9000)
         }
         else {
@@ -183,10 +211,10 @@ wss.on('connection', (ws) => {
       else if(msg.fn == 'authy-login-confirm') {
 
         const message = `Do you authorize login ${authyCode}?`
-        console.log(`sending login request for user id ${args.authyUserId} with code ${authyCode}`)
+        console.log(`sending login request for user id ${authyUserIdUsedForLogin} with code ${authyCode}`)
 
         const resApprovalReq = await authy_send_approval_request(
-          args.authyUserId, { message: message }, null, null)
+          authyUserIdUsedForLogin, { message: message }, null, null)
 
         const approvalUuid = resApprovalReq.approval_request.uuid
         console.log(`starting polling for authy login approval request ${approvalUuid}`)
@@ -340,9 +368,18 @@ wss.on('connection', (ws) => {
 
             const message = `Approve transaction ${tx.hash}?`
 
-            console.log(`sending approval request for user id ${args.authyUserId}`)
+            signAuthyUserId = getAuthyUserId()
+
+            if(signAuthyUserId !== authyUserIdUsedForLogin) {
+              console.log(`authy user id has changed since login (was "${authyUserIdUsedForLogin}",
+                it's now "${signAuthyUserId}"), refusing to sign transaction, restarting the node...`)
+              process.exit()
+              return
+            }
+
+            console.log(`sending approval request for user id ${authyUserIdUsedForLogin}`)
             const resApprovalReq = await authy_send_approval_request(
-              args.authyUserId, { message: message }, null, null)
+              authyUserIdUsedForLogin, { message: message }, null, null)
             // res = {
             //  approval_request: {"uuid":"########-####-####-####-############"},
             //  success: true

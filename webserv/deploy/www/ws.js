@@ -49,8 +49,28 @@
 
     function advance() {
       $('#gd-authy').remove();
-      $('body').append('<script type="text/javascript" src="bundle.js"></script>')
+      $('body').append('<script type="text/javascript" src="bundle.js"></script>');
     }
+
+    function authyInit() {
+      window._comm.req({ fn: 'authy-login-code' }).then(function(authyCode) {
+        if(authyCode === 0)
+          return advance(); // authy login disabled
+
+        if(authyCode === -1) {
+          // device is not fully initialized yet
+          $('#gd-authy-code').text('Please wait, the device is initializing...');
+          setTimeout(function() { authyInit(); }, 1000);
+        }
+        else {
+          $('#gd-authy-code').text(authyCode);
+          window._comm.req({ fn: 'authy-login-confirm' }).then(function(approved) {
+            if(approved)
+              advance();
+          });
+        }
+      });
+    };
 
     socket.onopen = function() {
       if(window._comm.connected)
@@ -67,16 +87,8 @@
       }, 5000);
 
       console.log('ws connected');
-      window._comm.req({ fn: 'authy-login-code' }).then(function(authyCode) {
-        if(authyCode === 0)
-          return advance(); // authy login disabled
-        $('#gd-authy-code').text(authyCode);
-        window._comm.req({ fn: 'authy-login-confirm' }).then(function(approved) {
-          if(approved)
-            advance();
-        });
-      });
-    };
+      authyInit();
+    }
 
     socket.onerror = function(err) {
       console.error(err);
@@ -94,7 +106,7 @@
       var msg = JSON.parse(packet.data);
       var rec = window._comm.requests[msg.id];
       if(!rec) {
-        console.dir(msg)
+        console.dir(msg);
         return console.error('unknown response id: ' + msg.id);
       }
       window._comm.requests[msg.id] = undefined;
