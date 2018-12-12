@@ -10,6 +10,10 @@ Neon Wallet served over HTTPS from an user-private, air-gap connected device.
 - Cygwin (Windows)
 - Git (through Cygwin on Windows, through Homebrew on Mac)
 
+### Note about Docker on Windows
+- put { "storage-driver": "aufs" } into your docker config:
+- https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-configuration-file
+- e.g. in Windows, create the file at C:\ProgramData\Docker\config\daemon.json
 
 ## HOWTO build
 
