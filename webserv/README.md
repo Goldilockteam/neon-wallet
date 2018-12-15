@@ -44,6 +44,9 @@ docker run -ti --rm -v C:/Users/$USER:/root:z -p 3000:3000 goldiwallet bash -isl
 # run the created docker image (Mac)
 docker run -ti --rm -v /Users/$USER:/root:z -p 3000:3000 goldiwallet bash -isl
 
+# run the created docker image (Linux)
+docker run -ti --rm -v /home/$USER:/root:z -p 3000:3000 goldiwallet bash -isl
+
 # *** from within the Docker machine: ***
 
 # this will work only if you have proper drive mapping in Docker
