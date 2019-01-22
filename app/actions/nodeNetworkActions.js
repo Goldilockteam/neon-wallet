@@ -4,6 +4,7 @@ import { createActions } from 'spunky'
 import {
   NODES_MAIN_NET,
   NODES_TEST_NET,
+  NODES_GOLDI_NET,
   MAIN_NETWORK_ID,
   TEST_NETWORK_ID,
   NODE_EXLUSION_CRITERIA
@@ -60,6 +61,11 @@ export default createActions(
         nodes = NODES_TEST_NET
         // eslint-disable-next-line
         totalDisplayed = NODES_TEST_NET.length
+        break
+      case GOLDI_NETWORK_ID:
+        nodes = NODES_GOLDI_NET
+        // eslint-disable-next-line
+        totalDisplayed = NODES_GOLDI_NET.length
         break
       default:
         nodes = NODES_MAIN_NET.filter(

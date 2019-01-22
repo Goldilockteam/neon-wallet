@@ -37,6 +37,9 @@ export const getRPCEndpoint = async (
       case TEST_NETWORK_ID:
         nodeList = NODES_TEST_NET
         break
+      case GOLDI_NETWORK_ID:
+        nodeList = NODES_GOLDI_NET
+        break
       default:
         nodeList = NODES_MAIN_NET
     }

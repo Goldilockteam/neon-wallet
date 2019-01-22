@@ -2,6 +2,7 @@
 import tokenList from './tokenList.json'
 import nodesMainNet from './nodes-main-net.json'
 import nodesTestNet from './nodes-test-net.json'
+import nodesGoldiNet from './nodes-goldi-net.json'
 
 export const NEON_WALLET_RELEASE_LINK =
   'https://github.com/CityOfZion/neon-wallet/releases'
@@ -92,7 +93,7 @@ export const MODAL_TYPES = {
 // export const MAIN_NETWORK_ID = '1'
 export const TEST_NETWORK_ID = '2'
 // export const COZ_TEST_NETWORK_ID = '3'
-// export const GOLDI_NETWORK_ID = '4'
+export const GOLDI_NETWORK_ID = '4'
 
 // TestNet
 export const TOKENS_TEST = {
@@ -184,5 +185,6 @@ export const TOKEN_SALE_FAILURE = 'token_sale_failure'
 
 export const NODES_MAIN_NET = nodesMainNet
 export const NODES_TEST_NET = nodesTestNet
+export const NODES_GOLDI_NET = nodesGoldiNet
 
 export const PRICE_UNAVAILABLE = 'N/A'
