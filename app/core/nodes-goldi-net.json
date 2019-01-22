@@ -1,2 +1,22 @@
 [
+  {
+    "url": "neo.goldilock.com",
+    "protocol": "https",
+    "port": "50333"
+  },
+  {
+    "url": "neo.goldilock.com",
+    "protocol": "https",
+    "port": "50334"
+  },
+  {
+    "url": "neo.goldilock.com",
+    "protocol": "https",
+    "port": "50335"
+  },
+  {
+    "url": "neo.goldilock.com",
+    "protocol": "https",
+    "port": "50336"
+  }
 ]
