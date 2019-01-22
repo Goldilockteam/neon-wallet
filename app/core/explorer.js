@@ -17,7 +17,8 @@ export const getExplorerBaseURL = (
         : 'https://testnet.neotracker.io'
     }
     case NEO_SCAN: {
-      return 'https://neo.goldilock.com' if isGoldiNetwork(networkId)
+      if (isGoldiNetwork(networkId))
+        return 'https://neo.goldilock.com'
       return isMainNet ? 'https://neoscan.io' : 'https://neoscan-testnet.io'
     }
     case ANT_CHAIN: {

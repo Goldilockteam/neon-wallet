@@ -91,8 +91,7 @@ cp tmpl.local.conf local.conf
 
 # *** from within the Docker machine: ***
 
-# use ssl.sh to launch your local instance
-$ (You can use ". http.sh" to start without HTTPS)
+# use ssl.sh to launch your local instance with HTTPS, or http.sh with HTTP
 . ssl.sh
 
 # update your local OS hosts file to contain entry:
